@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Unknown Controls - Niveau 2</title>
+<style>
+  body { margin:0; background:#111; color:white; font-family:sans-serif; text-align:center; }
+  canvas { display:block; margin:auto; background:black; }
+  #feedback { font-size:24px; margin-top:10px; height:30px; }
+  .colorBox { width:80px; height:80px; display:inline-block; margin:5px; border:2px solid white; }
+</style>
+</head>
+<body>
+
+<h1>Niveau 2 : Déchiffre le code couleur</h1>
+<div id="sequence"></div>
+<div id="feedback"></div>
+<p>Appuie sur les touches correspondantes aux couleurs (à deviner)</p>
+
+<script>
+const sequenceDiv = document.getElementById("sequence");
+const feedbackDiv = document.getElementById("feedback");
+
+// 🔑 Couleurs et touches secrètes
+const colors = ["red", "blue", "green", "yellow"];
+const keys = ["z", "s", "a", "e"]; // association secrète
+// exemple : red=z, blue=s, green=a, yellow=e
+
+// Séquence à deviner
+const codeSequence = ["red", "blue", "green", "yellow"];
+let playerIndex = 0;
+
+// Affiche les carrés colorés
+sequenceDiv.innerHTML = "";
+codeSequence.forEach(color => {
+  const box = document.createElement("div");
+  box.classList.add("colorBox");
+  box.style.background = color;
+  sequenceDiv.appendChild(box);
+});
+
+// 🎹 INPUT
+document.addEventListener("keydown", (e)=>{
+  const key = e.key.toLowerCase();
+  const expectedColor = codeSequence[playerIndex];
+  const expectedKey = keys[colors.indexOf(expectedColor)];
+
+  if(key === expectedKey){
+    feedbackDiv.style.color = "lime";
+    feedbackDiv.textContent = "✓ Correct !";
+    playerIndex++;
+    if(playerIndex === codeSequence.length){
+      setTimeout(()=>{alert("Bravo ! Niveau 2 terminé !");},100);
+    }
+  } else {
+    feedbackDiv.style.color = "red";
+    feedbackDiv.textContent = "✗ Faux ! Recommence";
+    playerIndex = 0;
+  }
+});
+</script>
+
+</body>
+</html>

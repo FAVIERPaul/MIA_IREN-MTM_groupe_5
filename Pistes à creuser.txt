@@ -1,0 +1,14 @@
+De mémoire vous vouliez vous intéresser aux decks de Clash Royal
+
+Il faudrait revoir l'idée car ça me parait pas vraiment faisable (trop dépendant de la manière de jouer et non seulement du deck).
+
+Si vous aimez les jeux vidéos essayez de (vibe)coder un jeu ! (un jeu que l'on pourrait essayer en classe ou alors plutôt un jeu en soirée)
+
+
+Sinon conseil de secteurs :
+
+- Culture, faire un Dashboard à partir des données du CNC (trouver ce qui pourrait être pertinent, déployer un site internet, automatisation de la récolte de données) + croiser avec l'api wikipedia (possibilité de récupérer le nombre de pages views des films, acteurs etc..)
+
+-Finance, construire des automatisations pour récupérer les données financières de certaines entreprises du même secteur, construire les index pertinents, puis donner des conseils d'investissement 
+
+

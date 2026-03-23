@@ -5,6 +5,7 @@ import { startGame4 } from "./games/game4.js";
 import { startGame5 } from "./games/game5.js";
 import { startGame6 } from "./games/game6.js";
 import { startGame7 } from "./games/game7.js";
+import { startGame8 } from "./games/game8.js";
 import { getAllLevels } from "./level.js";
 
 const levels = getAllLevels();
@@ -69,6 +70,7 @@ const gameFunctions = {
   game5: startGame5,
   game6: startGame6,
   game7: startGame7,
+  game8: startGame8,
 };
 
 function loadLevel() {

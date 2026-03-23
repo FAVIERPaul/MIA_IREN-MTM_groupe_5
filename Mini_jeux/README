@@ -1,0 +1,127 @@
+# Projet Final — Méthodologies de l’IA Générative (2025-2026)
+**Université Paris Dauphine - PSL**  
+**Master SIREN (Parcours IREN / MTM)**
+
+---
+
+## Présentation du projet
+
+Dans le cadre de ce projet, nous avons développé un **jeu interactif composé d’une succession de mini-jeux**, inspiré de concepts de type *“Unknown Controls”* et jeux cognitifs.
+
+L’objectif est de proposer une expérience ludique où le joueur doit s’adapter à des règles changeantes, parfois implicites ou trompeuses, à travers différents niveaux de difficulté.
+
+---
+
+## Problématique
+
+Comment concevoir une application interactive composée de nombreux mini-jeux, tout en garantissant :
+- une **structure modulaire et maintenable**
+- une **expérience utilisateur fluide**
+- une **progression cohérente en difficulté**
+- une **intégration potentielle de fonctionnalités avancées (score, classement, base de données)**
+
+---
+
+## Approche choisie
+
+Nous avons fait le choix de développer une **web application en HTML / CSS / JavaScript**, permettant :
+
+- une exécution simple (navigateur)
+- un partage facile via un lien
+- une architecture modulaire (chaque jeu est indépendant mais intégré)
+
+---
+
+## Architecture du projet
+
+MIA_IREN-MTM_groupe_5
+└── mini-jeux/
+    │
+    ├──  README.md        → présentation du projet
+    │
+    ├── index.html        → interface utilisateur
+    ├── style.css         → design et mise en forme
+    ├── main.js           → logique globale (enchaînement des niveaux)
+    ├── levels.js         → gestion des niveaux et difficulté
+    │
+    ├── firebase.js       → connexion à Firebase 
+    ├── score.js          → gestion des scores et classement
+    │
+    ├── games/            → ensemble des mini-jeux
+    │   ├── game1.js
+    │   ├── game2.js
+    │   ├── game3.js
+    │   └── ...     
+    │
+    └── assets/          → images / sons
+
+---
+## Contenu du projet
+
+### 1) index.html
+Fichier principal de l’application (interface utilisateur).
+
+- Affiche le menu principal (bouton “Commencer”)
+- Contient la zone d’affichage des jeux (`gameContainer`)
+- Sert de point d’entrée pour lancer l’application
+
+### 2) style.css
+Fichier de design (CSS).
+
+- Définit les couleurs, polices et styles visuels
+- Améliore l’expérience utilisateur (UX)
+- Permet d’harmoniser l’apparence des différents mini-jeux
+
+
+### 3) main.js
+Fichier central de la logique applicative.
+
+- Gère le lancement du jeu
+- Enchaîne les niveaux
+- Appelle les mini-jeux
+- Passe au niveau suivant via la fonction `onFinish()`
+
+### 4) levels.js
+Fichier de gestion des niveaux.
+
+- Définit l’ordre des mini-jeux
+- Associe chaque jeu à un niveau
+- Permet de structurer la progression (facile → difficile)
+
+### 5) firebase.js 
+Fichier de connexion à la base de données Firebase.
+
+- Initialise la connexion à Firebase
+- Permet d’envoyer et récupérer des données en ligne
+- Utilisé pour stocker les scores et profils utilisateurs
+
+### 6) score
+Fichier de gestion des scores et du classement.
+
+- Enregistre les scores des joueurs
+- Récupère les scores
+- Permet de créer un classement (local ou global)
+
+### 7) games
+Dossier contenant l’ensemble des mini-jeux.
+
+- Chaque fichier correspond à un mini-jeu indépendant
+- Tous les jeux suivent une structure commune pour être intégrés facilement
+
+Exemples :
+- `game1.js` : labyrinthe avec contrôles inversés
+- `game2.js` : jeu de mémoire avec couleurs et touches cachées
+....
+
+### Structure des mini-jeux
+Chaque mini-jeu est conçu selon une structure standard :
+
+```javascript
+export function startNomDuJeu(container, onFinish) {
+  container.innerHTML = "";
+
+  // logique du jeu
+
+  onFinish();
+}
+

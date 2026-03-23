@@ -20,7 +20,7 @@ export function startGame6(container, onFinish) {
   function checkAnswer() {
     const answer = input.value.toLowerCase().trim();
 
-    if (answer === "septuple") {
+    if (answer === "poussette") {
       setFeedback(feedbackDiv, true, "✓ Bien joué !");
       setTimeout(() => {
         onFinish(); 

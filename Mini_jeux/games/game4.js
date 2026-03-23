@@ -4,7 +4,7 @@ export function startGame4(container, onFinish) {
     container.innerHTML = "";
 
     const title = createGameTitle("Déchiffre l'énigme !");
-    const rebusDiv = createRebusDisplay("🐴💧🪺🐄");
+    const rebusDiv = createRebusDisplay("🐄🪺💧🐴");
     const input = createInputField();
     const button = createValidationButton();
     const feedbackDiv = createFeedbackDiv();

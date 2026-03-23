@@ -40,9 +40,12 @@ MIA_IREN-MTM_groupe_5
     ├──  README.md        → présentation du projet
     │
     ├── index.html        → interface utilisateur
-    ├── style.css         → design et mise en forme
     ├── main.js           → logique globale (enchaînement des niveaux)
     ├── levels.js         → gestion des niveaux et difficulté
+    │
+    ├── style.css         → design et mise en forme
+    │
+    ├── gameInterface.js  → composants UI réutilisables
     │
     ├── firebase.js       → connexion à Firebase 
     ├── score.js          → gestion des scores et classement
@@ -65,15 +68,35 @@ Fichier principal de l’application (interface utilisateur).
 - Contient la zone d’affichage des jeux (`gameContainer`)
 - Sert de point d’entrée pour lancer l’application
 
+---
+
 ### 2) style.css
 Fichier de design (CSS).
 
-- Définit les couleurs, polices et styles visuels
-- Améliore l’expérience utilisateur (UX)
-- Permet d’harmoniser l’apparence des différents mini-jeux
+- Gère l’interface globale
+- Assure la mise en forme visuelle
+- Garantit une cohérence graphique entre les mini-jeux
 
+---
 
-### 3) main.js
+### 3) gameInterface.js
+Fichier dédié à la gestion des composants d’interface réutilisables.
+
+Il contient des fonctions permettant de créer :
+- des titres
+- des zones d’affichage (rébus, canvas, etc.)
+- des champs de saisie
+- des boutons
+- des messages de feedback (✓ / ✗)
+
+Objectifs :
+- éviter la duplication de code
+- assurer une cohérence visuelle
+- faciliter le développement de nouveaux jeux
+
+---
+
+### 4) main.js
 Fichier central de la logique applicative.
 
 - Gère le lancement du jeu
@@ -81,47 +104,55 @@ Fichier central de la logique applicative.
 - Appelle les mini-jeux
 - Passe au niveau suivant via la fonction `onFinish()`
 
-### 4) levels.js
+---
+
+### 5) levels.js
 Fichier de gestion des niveaux.
 
 - Définit l’ordre des mini-jeux
 - Associe chaque jeu à un niveau
-- Permet de structurer la progression (facile → difficile)
+- Structure la progression (facile → difficile)
 
-### 5) firebase.js 
+---
+
+### 6) firebase.js 
 Fichier de connexion à la base de données Firebase.
 
 - Initialise la connexion à Firebase
-- Permet d’envoyer et récupérer des données en ligne
+- Permet d’envoyer et récupérer des données
 - Utilisé pour stocker les scores et profils utilisateurs
 
-### 6) score
+---
+
+### 7) score.js
 Fichier de gestion des scores et du classement.
 
 - Enregistre les scores des joueurs
 - Récupère les scores
 - Permet de créer un classement (local ou global)
 
-### 7) games
+---
+
+### 8) games/
 Dossier contenant l’ensemble des mini-jeux.
 
 - Chaque fichier correspond à un mini-jeu indépendant
 - Tous les jeux suivent une structure commune pour être intégrés facilement
 
-Exemples :
-- `game1.js` : labyrinthe avec contrôles inversés
-- `game2.js` : jeu de mémoire avec couleurs et touches cachées
-....
+---
 
 ### Structure des mini-jeux
+
 Chaque mini-jeu est conçu selon une structure standard :
 
 ```javascript
 export function startNomDuJeu(container, onFinish) {
   container.innerHTML = "";
 
-  // logique du jeu
+  // Initialisation du jeu
 
+  // Logique du jeu
+
+  // Appelé lorsque le joueur réussit
   onFinish();
 }
-

@@ -28,7 +28,7 @@ export function startGame3(container, onFinish) {
 
   const tileSize = 70;
 
-  // 🗺️ Labyrinthe très complexe
+  // Labyrinthe très complexe
   const level = {
     map: [
       [1,1,1,1,1,1,1,1,1,1],
@@ -45,7 +45,7 @@ export function startGame3(container, onFinish) {
     playerStart: { x: 1, y: 1 }
   };
 
-  // 🎲 Génération de touches ALÉATOIRES (dispersées sur le clavier)
+  // Génération de touches ALÉATOIRES (dispersées sur le clavier)
   const allKeys = [
     'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 
     'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 
@@ -119,7 +119,7 @@ export function startGame3(container, onFinish) {
     ctx.fillStyle = "#0a0a0a";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // 🎯 Départ (vert fluo pulsant)
+    // Départ (vert fluo pulsant)
     const startX = level.playerStart.x * tileSize;
     const startY = level.playerStart.y * tileSize;
     const pulse = Math.sin(Date.now() / 300) * 0.3 + 0.7;
@@ -130,7 +130,7 @@ export function startGame3(container, onFinish) {
     ctx.fillRect(startX, startY, tileSize, tileSize);
     ctx.shadowBlur = 0;
 
-    // 🏁 Arrivée (rouge fluo pulsant)
+    // Arrivée (rouge fluo pulsant)
     for (let y = 0; y < level.map.length; y++) {
       for (let x = 0; x < level.map[y].length; x++) {
         if (level.map[y][x] === 2) {
@@ -144,7 +144,7 @@ export function startGame3(container, onFinish) {
       }
     }
 
-    // 👣 Trace du chemin (s'estompe progressivement)
+    // Trace du chemin (s'estompe progressivement)
     trail.forEach((pos, i) => {
       const alpha = (i / trail.length) * 0.4;
       ctx.fillStyle = `rgba(131, 111, 255, ${alpha})`;
@@ -156,7 +156,7 @@ export function startGame3(container, onFinish) {
       );
     });
 
-    // 🔴 Joueur (avec halo lumineux)
+    // Joueur (avec halo lumineux)
     ctx.shadowBlur = 30;
     ctx.shadowColor = "#836fff";
     ctx.fillStyle = "#a28bff";

@@ -1,5 +1,12 @@
+import { createGameTitle, createFeedbackDiv, setFeedback, errorMessages } from "../gameInterface.js";
+
 export function startGame1(container, onFinish) {
   container.innerHTML = "";
+
+  const title = createGameTitle("Labyrinthe");
+  const feedbackDiv = createFeedbackDiv();
+  container.appendChild(title);
+  container.appendChild(feedbackDiv);
 
   const canvas = document.createElement("canvas");
   container.appendChild(canvas);
@@ -43,9 +50,7 @@ export function startGame1(container, onFinish) {
       player.y = newY;
 
       if (level.map[newY][newX] === 2) {
-        setTimeout(() => {
-          onFinish(); // 🔥 IMPORTANT
-        }, 200);
+        onWin();
       }
     }
   }
@@ -78,6 +83,15 @@ export function startGame1(container, onFinish) {
       tileSize - 20,
       tileSize - 20
     );
+  }
+
+  function showFeedback(isSuccess, message) {
+    setFeedback(feedbackDiv, isSuccess, message);
+  }
+
+  function onWin() {
+    showFeedback(true, "✓ Bien joué !");
+    setTimeout(onFinish, 500);
   }
 
   function loop() {

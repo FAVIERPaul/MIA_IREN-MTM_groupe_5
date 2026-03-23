@@ -1,5 +1,6 @@
 import { startGame1 } from "./games/game1.js";
 import { startGame2 } from "./games/game2.js";
+import { startGame3 } from "./games/game3.js";
 
 let currentLevel = 0;
 
@@ -25,12 +26,15 @@ function loadLevel() {
   } else if (currentLevel === 1) {
     gameTitle.textContent = "Mini-jeu 2 : Code couleur";
     startGame2(container, nextLevel);
+  } else if (currentLevel === 2) {
+    gameTitle.textContent = "Mini-jeu 3 : Labyrinthe invisible";
+    startGame3(container, nextLevel);
   }
 }
 
 function nextLevel() {
   currentLevel++;
-  if (currentLevel > 1) {
+  if (currentLevel > 2) {
     alert("Bravo, tu as terminé tous les jeux !");
   } else {
     loadLevel();

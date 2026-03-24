@@ -83,7 +83,8 @@ export function createMemoryGame(container, onFinish, pairs) {
   cardContainer.style.maxWidth = "600px";
   container.appendChild(cardContainer);
 
-  const cards = [...pairs, ...pairs.map(({ id, pair }) => ({ id: pair, pair: id }))]
+  const cards = pairs
+    .flatMap(({ id, pair }) => pair ? [{ id, pair }, { id: pair, pair: id }] : [{ id }]) // Create single cards for items without pairs
     .sort(() => Math.random() - 0.5)
     .map(({ id, pair }) => ({
       id,
@@ -127,7 +128,7 @@ export function createMemoryGame(container, onFinish, pairs) {
     cardBack.style.position = "absolute";
     cardBack.style.backfaceVisibility = "hidden";
     cardBack.style.transform = "rotateY(180deg)";
-    cardBack.style.backgroundColor = "#f8f8f8";
+    cardBack.style.backgroundColor = "#f8f8f8"; // Default background color
     cardBack.style.borderRadius = "15px";
 
     const img = document.createElement("img");
@@ -177,10 +178,22 @@ export function createMemoryGame(container, onFinish, pairs) {
           firstCard = null;
           secondCard = null;
 
-          if (matchedPairs === pairs.length) {
+          if (matchedPairs === pairs.filter(({ pair }) => pair).length) {
             setTimeout(() => {
-              alert("Bravo, vous avez gagné !");
-              onFinish();
+              // Flip intruders at the end and add red neon border
+              cards.forEach((cardData) => {
+                if (!cardData.pair) {
+                  const cardElement = Array.from(cardContainer.children).find(
+                    (child) => child.querySelector("img").src.includes(encodeURIComponent(cardData.id)) // Ensure proper encoding for spaces
+                  );
+                  if (cardElement) {
+                    const cardInner = cardElement.firstChild;
+                    cardInner.style.transform = "rotateY(180deg)";
+                    cardInner.style.boxShadow = "0 0 35px rgba(255, 0, 0, 0.8)"; // Red neon border
+                  }
+                }
+              });
+              setTimeout(onFinish, 1000); // Delay calling onFinish to ensure intruders are visible
             }, 500);
           }
 

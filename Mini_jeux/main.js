@@ -4,6 +4,8 @@ import { startGame3 } from "./games/game3.js";
 import { startGame4 } from "./games/game4.js";
 import { startGame5 } from "./games/game5.js";
 import { startGame6 } from "./games/game6.js";
+import { startGame7 } from "./games/game7.js";
+import { startGame8 } from "./games/game8.js";
 import { getAllLevels } from "./level.js";
 
 const levels = getAllLevels();
@@ -37,6 +39,24 @@ document.body.appendChild(nextGameButton);
 
 nextGameButton.addEventListener("click", nextLevel);
 
+const previousGameButton = document.createElement("button");
+previousGameButton.id = "previousGameButton";
+previousGameButton.textContent = "Précédent";
+previousGameButton.style.position = "fixed";
+previousGameButton.style.top = "10px";
+previousGameButton.style.left = "10px";
+previousGameButton.style.backgroundColor = "#4CAF50";
+previousGameButton.style.color = "white";
+previousGameButton.style.border = "none";
+previousGameButton.style.padding = "10px";
+previousGameButton.style.borderRadius = "5px";
+previousGameButton.style.cursor = "pointer";
+previousGameButton.style.zIndex = "1000";
+
+document.body.appendChild(previousGameButton);
+
+previousGameButton.addEventListener("click", previousLevel);
+
 window.startGame = function () {
   currentLevel = 0;
   loadLevel();
@@ -49,6 +69,8 @@ const gameFunctions = {
   game4: startGame4,
   game5: startGame5,
   game6: startGame6,
+  game7: startGame7,
+  game8: startGame8,
 };
 
 function loadLevel() {
@@ -71,4 +93,13 @@ function loadLevel() {
 function nextLevel() {
   currentLevel++;
   loadLevel();
+}
+
+function previousLevel() {
+  if (currentLevel > 0) {
+    currentLevel--;
+    loadLevel();
+  } else {
+    alert("Vous êtes déjà au premier niveau !");
+  }
 }

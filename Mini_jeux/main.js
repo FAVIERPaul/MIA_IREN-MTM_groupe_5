@@ -6,12 +6,12 @@ import { startGame5 } from "./games/game5.js";
 import { startGame6 } from "./games/game6.js";
 import { startGame7 } from "./games/game7.js";
 import { startGame8 } from "./games/game8.js";
-<<<<<<< Updated upstream
-=======
 import { startGame9 } from "./games/game9.js";
-import { startShrinkGame } from "./games/game12.js";
->>>>>>> Stashed changes
+import { startGame12 } from "./games/game12.js";
+import { startGame13 } from "./games/game13.js";
 import { getAllLevels } from "./level.js";
+import { startGame11 } from "./games/game11.js";
+import { startGame10 } from "./games/game10.js";
 
 const levels = getAllLevels();
 
@@ -63,6 +63,7 @@ document.body.appendChild(previousGameButton);
 previousGameButton.addEventListener("click", previousLevel);
 
 window.startGame = function () {
+  console.log("startGame function called");
   currentLevel = 0;
   loadLevel();
 };
@@ -76,15 +77,17 @@ const gameFunctions = {
   game6: startGame6,
   game7: startGame7,
   game8: startGame8,
-<<<<<<< Updated upstream
-=======
   game9: startGame9,
-  game12: startShrinkGame,
->>>>>>> Stashed changes
+  game10: startGame10,
+  game11: startGame11,
+  game12: startGame12,
+  game13: startGame13,
 };
 
 function loadLevel() {
+  console.log("loadLevel function called");
   const container = document.getElementById("gameContainer");
+  console.log("Game container initialized");
   const currentLevelData = levels[currentLevel];
 
   if (currentLevelData) {

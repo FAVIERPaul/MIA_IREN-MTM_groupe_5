@@ -20,7 +20,7 @@ export function startGame11(container, onFinish) {
   info.style.justifyContent = "space-between";
   info.style.marginBottom = "8px";
 
-  const scoreEl = document.createElement("span");
+  const scoreEl = document.createElement("span" );
   scoreEl.textContent = "Réussi: 0/5";
   const timerEl = document.createElement("span");
   timerEl.textContent = "Temps: 00:00";

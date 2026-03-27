@@ -1,4 +1,4 @@
-export function startShrinkGame(container, onFinish) {
+export function startGame12(container, onFinish) {
   if (!container) return;
 
   container.innerHTML = "";

@@ -6,7 +6,7 @@ export function startShrinkGame(container, onFinish) {
   const canvas = document.createElement("canvas");
   canvas.width = 600;
   canvas.height = 600;
-  canvas.style.background = "#0f172a"; // fond plus moderne
+  canvas.style.background = "#0f172a"; 
   canvas.style.display = "block";
   canvas.style.margin = "auto";
 
@@ -24,7 +24,6 @@ export function startShrinkGame(container, onFinish) {
   let foods = [];
   let shrinkZones = [];
 
-  // 🎨 couleurs plus clean (palette moderne)
   const foodColors = ["#60a5fa", "#34d399", "#fbbf24", "#f87171"];
   const zoneColor = "rgba(59, 130, 246, 0.15)"; // bleu soft
 
@@ -70,6 +69,8 @@ export function startShrinkGame(container, onFinish) {
 
   const foodInterval = setInterval(spawnFood, 900);
   const zoneInterval = setInterval(spawnZone, 2500);
+
+  let running = true; // Initialisation de la variable running
 
   function update() {
     if (keys["ArrowUp"]) player.y -= player.speed;
@@ -190,5 +191,5 @@ export function startShrinkGame(container, onFinish) {
     }, 100);
   }
 
-  gameLoop();
+  gameLoop(); 
 }

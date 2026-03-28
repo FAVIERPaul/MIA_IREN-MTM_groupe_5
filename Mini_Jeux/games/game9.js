@@ -1,4 +1,5 @@
 import { createMemoryGame } from "../gameInterface.js";
+import { startGame13 } from "./game13.js";
 
 export function startGame9(container, onFinish) {
   const pairs = [
@@ -43,7 +44,8 @@ export function startGame9(container, onFinish) {
       });
 
       setTimeout(() => {
-        onFinish(); // Delay the onFinish call to ensure intruders are visible
+        // Chain directly to game 13 once game 9 is completed.
+        startGame13(container, onFinish);
       }, 1000);
     }
   }

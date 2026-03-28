@@ -1,6 +1,7 @@
 import { createInputField, createValidationButton, createFeedbackDiv, setFeedback } from "../gameInterface.js";
 
-const levels = [
+export function startGame10(container, onFinish) {
+  const levels = [
   {
     question: "2, 4, 8, 16, ?",
     answer: "32",
@@ -41,9 +42,7 @@ const levels = [
     ,answer: "il n'y a pas de logique",
     hint: "Fais confiance à ton intuition finale."
   }
-];
-
-export function startGame10(container, onFinish) {
+  ];
   container.innerHTML = "";
 
   const title = document.createElement("h2");

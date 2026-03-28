@@ -1,20 +1,58 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Mini jeux</title>
+  <title>Gameverse</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h1>Mini jeux</h1>
+<canvas id="galaxyCanvas" aria-hidden="true"></canvas>
 
-<button onclick="startGame()">Commencer</button>
+<div class="nebula-layer" aria-hidden="true"></div>
+<div class="stars-layer" aria-hidden="true"></div>
 
-<button id="nextGameButton" onclick="nextLevel()" style="position: fixed; top: 10px; right: 10px; background-color: #4CAF50; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; z-index: 1000;">
-  Passer
-</button>
+<div class="side-deco" aria-hidden="true">
+  <div class="side-image side-canard"></div>
+  <div class="side-image side-manette"></div>
+  <div class="side-image side-bloc"></div>
+  <div class="side-image side-fantome"></div>
+  <div class="side-image side-pizza"></div>
+  <div class="side-image side-pacman"></div>
+</div>
 
-<div id="gameContainer"></div>
+<main id="homeScreen" class="home-screen">
+  <header class="hero">
+    <h1 id="gameLogo" class="game-logo">GAMEVERSE</h1>
+    <p class="tagline">Play Hard. Think Fast.</p>
+  </header>
+
+  <section class="mission-card">
+    <p class="mission-title">THINK OUT OF THE BOX</p>
+    <p class="mission-text">Oublie les regles usuelles. Chaque jeu te surprendra.</p>
+  </section>
+
+  <button id="startBtn" class="start-btn">START</button>
+</main>
+
+<section id="playArea" class="play-area hidden">
+  <h2 id="levelTitle" class="level-title">GAMEVERSE</h2>
+  <div id="gameContainer"></div>
+  <div id="navControls" class="nav-controls">
+    <button id="prevBtn" style="display:none">Precedent</button>
+    <button id="nextBtn" style="display:none">Passer</button>
+  </div>
+</section>
+
+
+
+<!-- icones flottantes -->
+<div class="floating-icons">
+  <div class="icon neon-controller"></div>
+  <div class="icon neon-duck"></div>
+  <div class="icon neon-pizza"></div>
+  <div class="icon neon-cassette"></div>
+  <div class="icon neon-invader"></div>
+</div>
 
 <script type="module" src="main.js"></script>
 <script type="module" src="firebase.js"></script>

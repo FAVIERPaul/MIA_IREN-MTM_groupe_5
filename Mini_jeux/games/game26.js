@@ -1,6 +1,6 @@
 let game24 = {};
 
-export function startGame24(container, onFinish) {
+export function startGame26(container, onFinish) {
     container.innerHTML = `
         <div style="text-align:center; font-family:'VT323', monospace; color:white; background:#2b1b10; padding:20px; border-radius:15px;">
             <h2 style="margin:0 0 8px;">🍦 Ice Stack Deluxe v2 — Glaces réalistes</h2>

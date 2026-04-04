@@ -1,4 +1,4 @@
-export function startGame12(container, onFinish) {
+export function startGame14(container, onFinish) {
   container.innerHTML = "";
 
   const title = document.createElement("h2");

@@ -1,6 +1,6 @@
 let game16 = {};
 
-export function startGame16(container, onFinish) {
+export function startGame18(container, onFinish) {
     container.innerHTML = `
         <div style="text-align:center; font-family: 'Segoe UI', sans-serif; color: white; background: #0d0d0d; padding: 20px; border-radius: 15px;">
             <div style="font-size: 1.2em; margin-bottom: 10px; font-family: 'VT323', monospace;">

@@ -283,6 +283,11 @@ export function startGame11(container, onFinish) {
     clearInterval(timerId);
   }
 
+  function startTimer() {
+    stopTimer();
+    timerId = currentTimer();
+  }
+
   function onPointerDown(event) {
     const rect = renderer.domElement.getBoundingClientRect();
     if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) {

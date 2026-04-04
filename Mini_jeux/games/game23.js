@@ -1,6 +1,6 @@
 let game21 = {};
 
-export function startGame21(container, onFinish) {
+export function startGame23(container, onFinish) {
     container.innerHTML = `
         <div style="text-align:center; font-family:'VT323', monospace; color:white; background:#050509; padding:20px; border-radius:15px;">
             <h2 style="margin:0 0 8px;">🁢 Dominos inversés — Puzzle à solution unique</h2>

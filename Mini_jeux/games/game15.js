@@ -1,6 +1,6 @@
 let gameState = {};
 
-export function startGame13(container, onFinish) {
+export function startGame15(container, onFinish) {
     // 1. Agrandissement de la Grille (8x8) pour l'UX
     container.innerHTML = `
         <div style="text-align:center; font-family: 'Segoe UI', sans-serif; color: white; background: #1a1a1a; padding: 20px; border-radius: 15px;">

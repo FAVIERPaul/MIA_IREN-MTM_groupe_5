@@ -1,115 +1,99 @@
-import { startGame1 } from "./games/game1.js";
-import { startGame2 } from "./games/game2.js";
-import { startGame3 } from "./games/game3.js";
-import { startGame4 } from "./games/game4.js";
-import { startGame5 } from "./games/game5.js";
-import { startGame6 } from "./games/game6.js";
-import { startGame7 } from "./games/game7.js";
-import { startGame8 } from "./games/game8.js";
-import { startGame9 } from "./games/game9.js";
-import { startGame10 } from "./games/game10.js";
-import { startGame11 } from "./games/game11.js";
-import { startGame12 } from "./games/game12.js";
-import { startGame13 } from "./games/game13.js";
 import { getAllLevels } from "./level.js";
 
 const levels = getAllLevels();
-
 let currentLevel = 0;
 
-// Ajout d'un élément pour afficher le titre du mini-jeu
-const gameTitle = document.createElement("h2");
-gameTitle.id = "gameTitle";
-gameTitle.style.marginTop = "20px";
-gameTitle.style.color = "#836fff";
-gameTitle.style.textShadow = "2px 2px 5px rgba(0, 0, 0, 0.7)";
-document.body.insertBefore(gameTitle, document.getElementById("gameContainer"));
+const homeScreen = document.getElementById("homeScreen");
+const playArea = document.getElementById("playArea");
+const startBtn = document.getElementById("startBtn");
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
+const levelTitle = document.getElementById("levelTitle");
+const container = document.getElementById("gameContainer");
 
-// Ensure global logic for the 'nextGameButton' is centralized here.
-const nextGameButton = document.createElement("button");
-nextGameButton.id = "nextGameButton";
-nextGameButton.textContent = "Passer";
-nextGameButton.style.position = "fixed";
-nextGameButton.style.top = "10px";
-nextGameButton.style.right = "10px";
-nextGameButton.style.backgroundColor = "#4CAF50";
-nextGameButton.style.color = "white";
-nextGameButton.style.border = "none";
-nextGameButton.style.padding = "10px";
-nextGameButton.style.borderRadius = "5px";
-nextGameButton.style.cursor = "pointer";
-nextGameButton.style.zIndex = "1000";
+function getGameFilePath(levelGameId) {
+  return `./games/${levelGameId}.js`;
+}
 
-document.body.appendChild(nextGameButton);
+function resolveStarter(module, levelGameId) {
+  const expectedExport = `start${levelGameId.charAt(0).toUpperCase()}${levelGameId.slice(1)}`;
 
-nextGameButton.addEventListener("click", nextLevel);
+  if (typeof module[expectedExport] === "function") {
+    return module[expectedExport];
+  }
 
-const previousGameButton = document.createElement("button");
-previousGameButton.id = "previousGameButton";
-previousGameButton.textContent = "Précédent";
-previousGameButton.style.position = "fixed";
-previousGameButton.style.top = "10px";
-previousGameButton.style.left = "10px";
-previousGameButton.style.backgroundColor = "#4CAF50";
-previousGameButton.style.color = "white";
-previousGameButton.style.border = "none";
-previousGameButton.style.padding = "10px";
-previousGameButton.style.borderRadius = "5px";
-previousGameButton.style.cursor = "pointer";
-previousGameButton.style.zIndex = "1000";
+  const firstMatchingExport = Object.keys(module).find((key) => /^startGame\d+$/.test(key) && typeof module[key] === "function");
+  if (firstMatchingExport) {
+    return module[firstMatchingExport];
+  }
 
-document.body.appendChild(previousGameButton);
+  return null;
+}
 
-previousGameButton.addEventListener("click", previousLevel);
+function updateNavButtons() {
+  prevBtn.style.display = currentLevel > 0 ? "inline-block" : "none";
+  nextBtn.style.display = currentLevel < levels.length - 1 ? "inline-block" : "none";
+}
 
-window.startGame = function () {
-  currentLevel = 0;
-  loadLevel();
-};
-
-const gameFunctions = {
-  game1: startGame1,
-  game2: startGame2,
-  game3: startGame3,
-  game4: startGame4,
-  game5: startGame5,
-  game6: startGame6,
-  game7: startGame7,
-  game8: startGame8,
-  game9: startGame9,
-  game10: startGame10,
-  game11: startGame11,
-  game12: startGame12,
-  game13: startGame13,
-};
-
-function loadLevel() {
-  const container = document.getElementById("gameContainer");
+async function loadLevel() {
   const currentLevelData = levels[currentLevel];
 
-  if (currentLevelData) {
-    gameTitle.textContent = `Mini-jeu ${currentLevel + 1} : ${currentLevelData.game}`;
-    const startGameFunction = gameFunctions[currentLevelData.game];
-    if (startGameFunction) {
-      startGameFunction(container, nextLevel);
-    } else {
-      console.error(`No function found for game: ${currentLevelData.game}`);
+  if (!currentLevelData) {
+    levelTitle.textContent = "Bravo !";
+    container.innerHTML = "<h3>Tous les jeux sont terminés</h3>";
+    prevBtn.style.display = levels.length > 0 ? "inline-block" : "none";
+    nextBtn.style.display = "none";
+    return;
+  }
+
+  levelTitle.textContent = `Niveau ${currentLevel + 1} - ${currentLevelData.game}`;
+  container.innerHTML = "";
+
+  try {
+    const module = await import(getGameFilePath(currentLevelData.game));
+    const startGameFunction = resolveStarter(module, currentLevelData.game);
+
+    if (!startGameFunction) {
+      throw new Error(`Aucune fonction de demarrage trouvee dans ${currentLevelData.game}.js`);
     }
-  } else {
-    alert("Bravo, tu as terminé tous les jeux !");
+
+    startGameFunction(container, nextLevel);
+    updateNavButtons();
+  } catch (error) {
+    console.error(error);
+    container.innerHTML = `<p>Erreur de chargement pour ${currentLevelData.game}.</p>`;
+    updateNavButtons();
   }
 }
 
-function nextLevel() {
-  currentLevel++;
+function startGameFlow() {
+  currentLevel = 0;
+  homeScreen.classList.add("hidden");
+  playArea.classList.remove("hidden");
+  document.body.classList.add("in-game");
   loadLevel();
+}
+
+function nextLevel() {
+  if (currentLevel < levels.length - 1) {
+    currentLevel += 1;
+    loadLevel();
+  } else {
+    levelTitle.textContent = "Bravo !";
+    container.innerHTML = "<h3>Tous les jeux sont terminés</h3>";
+    updateNavButtons();
+  }
 }
 
 function previousLevel() {
   if (currentLevel > 0) {
-    currentLevel--;
+    currentLevel -= 1;
     loadLevel();
-  } else {
-    alert("Vous êtes déjà au premier niveau !");
   }
 }
+
+startBtn.addEventListener("click", startGameFlow);
+nextBtn.addEventListener("click", nextLevel);
+prevBtn.addEventListener("click", previousLevel);
+
+window.startGame = startGameFlow;

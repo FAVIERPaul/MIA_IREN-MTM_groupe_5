@@ -1,364 +1,424 @@
-let game24 = {};
+let game26 = {};
 
 export function startGame26(container, onFinish) {
     container.innerHTML = `
-        <div style="text-align:center; font-family:'VT323', monospace; color:white; background:#2b1b10; padding:20px; border-radius:15px;">
-            <h2 style="margin:0 0 8px;">🍦 Ice Stack Deluxe v2 — Glaces réalistes</h2>
+        <div style="text-align:center; font-family:'VT323', monospace; color:#111; background:#e0e0e0; padding:20px; border-radius:15px;">
+            <h2 style="margin:0 0 8px;">🖌️ Color Chaos — Le coloriage raté qui gagne</h2>
             <p style="margin:0 0 8px; font-size:0.95em;">
-                Empile les boules de glace sur le cornet.<br>
-                <span style="color:#ffdd99;">La boule dont le parfum commence le plus tôt dans l'alphabet doit être en bas…</span>
+                Colorie le dessin avec le pinceau.<br>
+                <span style="color:#c0392b;">Tu crois devoir colorier proprement… mais la vraie victoire est ailleurs.</span>
             </p>
 
-            <canvas id="iceCanvas24" width="900" height="600"
-                style="border:4px solid #ffdd99; border-radius:8px; box-shadow:0 0 25px #ffdd99aa; background:#1a0f08;">
+            <canvas id="colorCanvas26" width="900" height="600"
+                style="border:4px solid #bbb; border-radius:8px; box-shadow:0 0 25px #00000022; background:#b5b5b5;">
             </canvas>
 
-            <p id="msg24" style="margin-top:8px; min-height:24px; font-size:1.05em;">
-                Choisis une boule et dépose-la sur le cornet.
+            <p id="msg26" style="margin-top:8px; min-height:24px; font-size:1.05em;">
+                Choisis une couleur, trempe le pinceau, puis peins sur le dessin.
             </p>
         </div>
     `;
 
-    const canvas = container.querySelector("#iceCanvas24");
+    const canvas = container.querySelector("#colorCanvas26");
     const ctx = canvas.getContext("2d");
 
-    /* ---------- PARFUMS ---------- */
-    const FLAVORS = [
-        { name: "caramel", color: "#c68c53" },
-        { name: "chocolat", color: "#5a3a1e" },
-        { name: "citron", color: "#fff36b" },
-        { name: "fraise", color: "#ff6b81" },
-        { name: "menthe", color: "#7fffd4" },
-        { name: "myrtille", color: "#6b5bff" },
-        { name: "pistache", color: "#9be39b" },
-        { name: "vanille", color: "#f3e5ab" },
-        // parfum trompeur
-        { name: "yaourt", color: "#ffffff" }
+    const maskCanvas = document.createElement("canvas");
+    const maskCtx = maskCanvas.getContext("2d");
+    const paintCanvas = document.createElement("canvas");
+    const paintCtx = paintCanvas.getContext("2d");
+
+    maskCanvas.width = paintCanvas.width = canvas.width;
+    maskCanvas.height = paintCanvas.height = canvas.height;
+
+    const palette = [
+        { name: "rouge", color: "#e74c3c" },
+        { name: "bleu", color: "#3498db" },
+        { name: "vert", color: "#2ecc71" },
+        { name: "jaune", color: "#f1c40f" },
+        { name: "violet", color: "#9b59b6" },
+        { name: "orange", color: "#e67e22" }
     ];
 
-    const chosen = shuffle24([...FLAVORS]).slice(0, 6);
-    const winningOrder = [...chosen].sort((a, b) => a.name.localeCompare(b.name));
-
-    const cone = {
-        x: 450,
-        y: 450,
-        w: 150,
-        h: 190
-    };
-
-    const scoops = chosen.map((f, i) => ({
-        id: i,
-        flavor: f.name,
-        color: f.color,
-        x: 120 + i * 120,
-        y: 500,
-        r: 45,
-        homeX: 120 + i * 120,
-        homeY: 500,
-        placedIndex: null,
-        melting: false,
-        meltProgress: 0,
-        dripY: null
-    }));
-
-    game24 = {
+    const state = {
         ctx,
         canvas,
+        maskCtx,
+        paintCtx,
+        palette,
+        brushColor: palette[0].color,
+        brushSize: 18,
+        isPainting: false,
+        lastX: null,
+        lastY: null,
+        usedColors: new Set(),
+        statsDirty: true,
+        insideCount: 0,
+        outsideCount: 0,
+        gameOver: false,
         onFinish,
-        scoops,
-        cone,
-        winningOrder,
-        placed: [],
-        dragging: null,
-        dragOffsetX: 0,
-        dragOffsetY: 0,
-        gameOver: false
+        cursorX: null,
+        cursorY: null
     };
 
-    canvas.addEventListener("mousedown", onMouseDown24);
-    canvas.addEventListener("mousemove", onMouseMove24);
-    canvas.addEventListener("mouseup", onMouseUp24);
-    canvas.addEventListener("mouseleave", onMouseUp24);
+    game26 = state;
 
-    requestAnimationFrame(loop24);
+    drawPaperAndOutline26();
+    drawMaskOutline26(maskCtx);
+
+    canvas.addEventListener("mousedown", onMouseDown26);
+    canvas.addEventListener("mousemove", onMouseMove26);
+    canvas.addEventListener("mouseup", onMouseUp26);
+    canvas.addEventListener("mouseleave", onMouseUp26);
+
+    canvas.addEventListener("mousemove", e => {
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        game26.cursorX = x;
+        game26.cursorY = y;
+    });
+
+    renderLoop26();
 }
 
 /* ---------- INPUT ---------- */
 
-function onMouseDown24(e) {
-    if (game24.gameOver) return;
+function onMouseDown26(e) {
+    if (game26.gameOver) return;
 
-    const rect = game24.canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const { x, y } = getCanvasPos26(e);
+    if (tryPickColor26(x, y)) return;
 
-    for (let i = game24.scoops.length - 1; i >= 0; i--) {
-        const s = game24.scoops[i];
-        if (!s.melting && dist24(x, y, s.x, s.y) < s.r) {
-            game24.dragging = s;
-            game24.dragOffsetX = x - s.x;
-            game24.dragOffsetY = y - s.y;
-            return;
-        }
-    }
+    game26.isPainting = true;
+    game26.lastX = x;
+    game26.lastY = y;
+    game26.usedColors.add(game26.brushColor);
 }
 
-function onMouseMove24(e) {
-    if (!game24.dragging) return;
+function onMouseMove26(e) {
+    if (!game26.isPainting || game26.gameOver) return;
+    const { x, y } = getCanvasPos26(e);
 
-    const rect = game24.canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    game24.dragging.x = x - game24.dragOffsetX;
-    game24.dragging.y = y - game24.dragOffsetY;
+    drawStroke26(game26.paintCtx, game26.lastX, game26.lastY, x, y, game26.brushColor, game26.brushSize);
+    game26.lastX = x;
+    game26.lastY = y;
+    game26.statsDirty = true;
 }
 
-function onMouseUp24() {
-    if (!game24.dragging) return;
-
-    const s = game24.dragging;
-
-    if (isOverCone24(s)) {
-        placeScoop24(s);
-    } else {
-        s.x = s.homeX;
-        s.y = s.homeY;
-    }
-
-    game24.dragging = null;
+function onMouseUp26() {
+    if (!game26.isPainting) return;
+    game26.isPainting = false;
+    checkWinCondition26();
 }
 
 /* ---------- LOGIQUE ---------- */
 
-function isOverCone24(s) {
-    const c = game24.cone;
-    return (
-        s.x > c.x - 60 &&
-        s.x < c.x + 60 &&
-        s.y > c.y - 220 &&
-        s.y < c.y + 20
-    );
+function getCanvasPos26(e) {
+    const rect = game26.canvas.getBoundingClientRect();
+    return {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+    };
 }
 
-function placeScoop24(s) {
-    const index = game24.placed.length;
+function tryPickColor26(x, y) {
+    const paletteY = 520;
+    const radius = 22;
 
-    s.x = game24.cone.x;
-    s.y = game24.cone.y - index * 55;
-    s.placedIndex = index;
-
-    game24.placed.push(s);
-
-    setMsg24(`Tu as ajouté : ${s.flavor}`);
-
-    if (game24.placed.length === game24.scoops.length) {
-        checkWin24();
+    for (let i = 0; i < game26.palette.length; i++) {
+        const cx = 140 + i * 110;
+        const cy = paletteY;
+        if (Math.hypot(x - cx, y - cy) <= radius) {
+            game26.brushColor = game26.palette[i].color;
+            setMsg26(`Pinceau chargé en ${game26.palette[i].name}.`);
+            return true;
+        }
     }
+    return false;
 }
 
-function checkWin24() {
-    const correct = game24.placed.every((s, i) =>
-        s.flavor === game24.winningOrder[i].name
-    );
+function drawStroke26(ctx, x1, y1, x2, y2, color, size) {
+    ctx.save();
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.strokeStyle = color;
+    ctx.lineWidth = size;
+    ctx.globalAlpha = 0.9;
 
-    if (correct) {
-        setMsg24("🎉 Bravo ! Tu as trouvé l'ordre secret : l'ordre alphabétique (de bas en haut) !");
-        game24.gameOver = true;
-        setTimeout(() => game24.onFinish && game24.onFinish(), 1500);
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+
+    ctx.restore();
+}
+
+function computeStats26() {
+    const w = game26.canvas.width;
+    const h = game26.canvas.height;
+
+    const paintData = game26.paintCtx.getImageData(0, 0, w, h).data;
+    const maskData = game26.maskCtx.getImageData(0, 0, w, h).data;
+
+    let inside = 0;
+    let outside = 0;
+
+    for (let i = 0; i < paintData.length; i += 4) {
+        const alpha = paintData[i + 3];
+        if (alpha === 0) continue;
+
+        const maskAlpha = maskData[i + 3];
+        if (maskAlpha > 0) inside++;
+        else outside++;
+    }
+
+    game26.insideCount = inside;
+    game26.outsideCount = outside;
+    game26.statsDirty = false;
+}
+
+function checkWinCondition26() {
+    if (game26.statsDirty) computeStats26();
+
+    const total = game26.insideCount + game26.outsideCount;
+    if (total === 0) return;
+
+    const ratioOutside = game26.outsideCount / total;
+    const colorsUsed = game26.usedColors.size;
+
+    if (ratioOutside > 0.5 && colorsUsed >= 3) {
+        game26.gameOver = true;
+        setMsg26("🎉 Tu as gagné… en dépassant partout et avec plein de couleurs. Le coloriage parfait, c'était le chaos.");
+        setTimeout(() => game26.onFinish && game26.onFinish(), 1500);
     } else {
-        setMsg24("❌ Mauvais ordre… Les boules fondent !");
-        triggerMelting24();
-    }
-}
-
-function triggerMelting24() {
-    for (const s of game24.scoops) {
-        if (s.placedIndex != null) {
-            s.melting = true;
-            s.meltProgress = 0;
-            s.dripY = s.y + s.r;
-        }
-    }
-    game24.placed = [];
-}
-
-/* ---------- ANIMATION ---------- */
-
-function loop24() {
-    updateMelting24();
-    render24();
-    requestAnimationFrame(loop24);
-}
-
-function updateMelting24() {
-    for (const s of game24.scoops) {
-        if (s.melting) {
-            s.meltProgress += 0.02;
-            if (s.meltProgress >= 1) {
-                s.melting = false;
-                s.placedIndex = null;
-                s.x = s.homeX;
-                s.y = s.homeY;
-                s.dripY = null;
-            } else if (s.dripY != null) {
-                s.dripY += 3;
-            }
+        if (colorsUsed < 3) {
+            setMsg26("Tu ne dépasses pas assez ou tu n'as pas utilisé assez de couleurs. Ose plus, mélange au moins 3 couleurs.");
+        } else {
+            setMsg26("Tu es encore trop sage… dépasse davantage du dessin (au moins 70% de ta peinture doit être hors des lignes).");
         }
     }
 }
 
-/* ---------- RENDER ---------- */
+/* ---------- RENDER LOOP ---------- */
 
-function render24() {
-    const ctx = game24.ctx;
-    const canvas = game24.canvas;
+function renderLoop26() {
+    render26();
+    requestAnimationFrame(renderLoop26);
+}
+
+function render26() {
+    const ctx = game26.ctx;
+    const canvas = game26.canvas;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    drawBackground24(ctx, canvas);
-    drawCone24(ctx, game24.cone);
+    drawPaper26(ctx);
+    drawOutline26(ctx);
+    ctx.drawImage(game26.paintCtx.canvas, 0, 0);
 
-    const sorted = [...game24.scoops].sort((a, b) => {
-        const ai = a.placedIndex != null ? a.placedIndex : 999;
-        const bi = b.placedIndex != null ? b.placedIndex : 999;
-        return ai - bi;
-    });
-
-    for (const s of sorted) {
-        drawScoop24(ctx, s);
-    }
+    drawPalette26(ctx);
+    drawBrushCursor26(ctx);
 }
 
-/* ---------- DESSIN ---------- */
+/* ---------- DESSIN : FEUILLE + DESSIN ---------- */
 
-function drawBackground24(ctx, canvas) {
-    const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    grad.addColorStop(0, "#1a0f08");
-    grad.addColorStop(1, "#3b2414");
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+function drawPaperAndOutline26() {
+    const ctx = game26.ctx;
+    drawPaper26(ctx);
+    drawOutline26(ctx);
 }
 
-function drawCone24(ctx, cone) {
+function drawPaper26(ctx) {
+    const x = 80, y = 40, w = 740, h = 430, r = 18;
+
     ctx.save();
 
-    const grad = ctx.createLinearGradient(cone.x, cone.y, cone.x, cone.y + cone.h);
-    grad.addColorStop(0, "#f2c27b");
-    grad.addColorStop(1, "#c58a45");
+    const grad = ctx.createLinearGradient(x, y, x, y + h);
+    grad.addColorStop(0, "#ffffff");
+    grad.addColorStop(1, "#f5f5f5");
 
     ctx.fillStyle = grad;
-    ctx.strokeStyle = "#8b5a2b";
+    ctx.strokeStyle = "#cccccc";
     ctx.lineWidth = 3;
 
     ctx.beginPath();
-    ctx.moveTo(cone.x - cone.w / 2, cone.y);
-    ctx.lineTo(cone.x + cone.w / 2, cone.y);
-    ctx.lineTo(cone.x, cone.y + cone.h);
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
     ctx.closePath();
     ctx.fill();
     ctx.stroke();
 
-    ctx.strokeStyle = "#b5833a";
-    ctx.lineWidth = 1.2;
+    ctx.restore();
+}
 
-    for (let i = -cone.w; i <= cone.w; i += 12) {
+function drawOutline26(ctx) {
+    ctx.save();
+    ctx.strokeStyle = "#000000";
+    ctx.lineWidth = 3;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+
+    const offsetX = 150;
+    const offsetY = 80;
+
+    // Maison
+    ctx.beginPath();
+    ctx.rect(offsetX + 80, offsetY + 140, 200, 160);
+    ctx.moveTo(offsetX + 80, offsetY + 140);
+    ctx.lineTo(offsetX + 180, offsetY + 60);
+    ctx.lineTo(offsetX + 280, offsetY + 140);
+    ctx.stroke();
+
+    // Porte
+    ctx.beginPath();
+    ctx.rect(offsetX + 160, offsetY + 210, 60, 90);
+    ctx.stroke();
+
+    // Fenêtre
+    ctx.beginPath();
+    ctx.rect(offsetX + 220, offsetY + 180, 40, 40);
+    ctx.moveTo(offsetX + 240, offsetY + 180);
+    ctx.lineTo(offsetX + 240, offsetY + 220);
+    ctx.moveTo(offsetX + 220, offsetY + 200);
+    ctx.lineTo(offsetX + 260, offsetY + 200);
+    ctx.stroke();
+
+    // Arbre
+    const ax = offsetX + 360;
+    const ay = offsetY + 180;
+    ctx.beginPath();
+    ctx.rect(ax - 20, ay + 60, 40, 100);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(ax, ay, 60, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Soleil
+    const sx = offsetX + 380;
+    const sy = offsetY + 40;
+    ctx.beginPath();
+    ctx.arc(sx, sy, 25, 0, Math.PI * 2);
+    ctx.stroke();
+    for (let i = 0; i < 8; i++) {
+        const a = (Math.PI * 2 * i) / 8;
         ctx.beginPath();
-        ctx.moveTo(cone.x + i / 2, cone.y);
-        ctx.lineTo(cone.x, cone.y + cone.h);
-        ctx.stroke();
-    }
-    for (let i = cone.w; i >= -cone.w; i -= 12) {
-        ctx.beginPath();
-        ctx.moveTo(cone.x + i / 2, cone.y);
-        ctx.lineTo(cone.x, cone.y + cone.h);
+        ctx.moveTo(sx + Math.cos(a) * 30, sy + Math.sin(a) * 30);
+        ctx.lineTo(sx + Math.cos(a) * 45, sy + Math.sin(a) * 45);
         ctx.stroke();
     }
 
     ctx.restore();
 }
 
-function drawScoop24(ctx, s) {
+function drawMaskOutline26(maskCtx) {
+    maskCtx.clearRect(0, 0, maskCtx.canvas.width, maskCtx.canvas.height);
+    maskCtx.save();
+    maskCtx.fillStyle = "rgba(0,0,0,1)";
+    maskCtx.strokeStyle = "rgba(0,0,0,1)";
+    maskCtx.lineWidth = 6;
+    maskCtx.lineCap = "round";
+    maskCtx.lineJoin = "round";
+
+    const offsetX = 150;
+    const offsetY = 80;
+
+    // Maison remplie
+    maskCtx.beginPath();
+    maskCtx.rect(offsetX + 80, offsetY + 140, 200, 160);
+    maskCtx.fill();
+
+    maskCtx.beginPath();
+    maskCtx.moveTo(offsetX + 80, offsetY + 140);
+    maskCtx.lineTo(offsetX + 180, offsetY + 60);
+    maskCtx.lineTo(offsetX + 280, offsetY + 140);
+    maskCtx.closePath();
+    maskCtx.fill();
+
+    // Arbre
+    const ax = offsetX + 360;
+    const ay = offsetY + 180;
+    maskCtx.beginPath();
+    maskCtx.rect(ax - 20, ay + 60, 40, 100);
+    maskCtx.fill();
+
+    maskCtx.beginPath();
+    maskCtx.arc(ax, ay, 60, 0, Math.PI * 2);
+    maskCtx.fill();
+
+    // Soleil
+    const sx = offsetX + 380;
+    const sy = offsetY + 40;
+    maskCtx.beginPath();
+    maskCtx.arc(sx, sy, 25, 0, Math.PI * 2);
+    maskCtx.fill();
+
+    maskCtx.restore();
+}
+
+/* ---------- PALETTE & PINCEAU ---------- */
+
+function drawPalette26(ctx) {
+    const paletteY = 520;
+    const radius = 22;
+
     ctx.save();
+    ctx.font = "18px VT323";
+    ctx.textAlign = "left";
+    ctx.fillStyle = "#333";
+    ctx.fillText("Palette :", 80, paletteY + 6);
 
-    let r = s.r;
-    let y = s.y;
-    let flatten = 0.25;
+    for (let i = 0; i < game26.palette.length; i++) {
+        const color = game26.palette[i].color;
+        const cx = 140 + i * 110;
+        const cy = paletteY;
 
-    if (s.melting) {
-        const p = s.meltProgress;
-        r *= (1 - p * 0.6);
-        y += p * 30;
-        flatten = 0.25 + p * 0.4;
-    }
-
-    const topY = y - r;
-    const bottomY = y + r * flatten;
-
-    ctx.shadowColor = s.color + "aa";
-    ctx.shadowBlur = 18;
-
-    const grad = ctx.createRadialGradient(s.x - 10, topY + 10, r * 0.2, s.x, y, r);
-    grad.addColorStop(0, lighten24(s.color, 0.35));
-    grad.addColorStop(0.5, s.color);
-    grad.addColorStop(1, darken24(s.color, 0.25));
-
-    ctx.fillStyle = grad;
-    ctx.beginPath();
-
-    const steps = 24;
-    for (let i = 0; i <= steps; i++) {
-        const angle = Math.PI * (i / steps);
-        const wobble = Math.sin(i * 0.7) * 3;
-        const px = s.x + Math.cos(angle) * (r + wobble);
-        const py = y - Math.sin(angle) * (r + wobble * 0.5);
-        if (i === 0) ctx.moveTo(px, py);
-        else ctx.lineTo(px, py);
-    }
-
-    ctx.lineTo(s.x + r, bottomY);
-    ctx.lineTo(s.x - r, bottomY);
-    ctx.closePath();
-    ctx.fill();
-
-    ctx.shadowBlur = 0;
-
-    ctx.fillStyle = "rgba(255,255,255,0.25)";
-    ctx.beginPath();
-    ctx.ellipse(s.x - r * 0.3, y - r * 0.4, r * 0.4, r * 0.25, -0.4, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.fillStyle = darken24(s.color, 0.3);
-    ctx.beginPath();
-    ctx.ellipse(s.x, bottomY, r * 0.9, r * 0.25, 0, 0, Math.PI * 2);
-    ctx.globalAlpha = 0.4;
-    ctx.fill();
-    ctx.globalAlpha = 1;
-
-    if (s.melting && s.dripY != null) {
-        ctx.fillStyle = s.color;
+        ctx.save();
+        ctx.shadowColor = "#00000055";
+        ctx.shadowBlur = 8;
+        ctx.fillStyle = color;
         ctx.beginPath();
-        ctx.arc(s.x + 8, s.dripY, 6, 0, Math.PI * 2);
+        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
         ctx.fill();
+        ctx.restore();
+
+        if (color === game26.brushColor) {
+            ctx.strokeStyle = "#000";
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius + 4, 0, Math.PI * 2);
+            ctx.stroke();
+        }
     }
 
     ctx.restore();
+}
 
-    if (!s.melting) {
-        ctx.fillStyle = "#ffffff";
-        ctx.font = "16px VT323";
-        ctx.textAlign = "center";
-        ctx.fillText(s.flavor, s.x, s.y + s.r + 20);
-    }
+function drawBrushCursor26(ctx) {
+    if (game26.cursorX == null || game26.cursorY == null) return;
+    const x = game26.cursorX;
+    const y = game26.cursorY;
+
+    ctx.save();
+    ctx.globalAlpha = 0.8;
+    ctx.strokeStyle = game26.brushColor;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(x, y, game26.brushSize / 2, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
 }
 
 /* ---------- UTILS ---------- */
 
-function dist24(x1, y1, x2, y2) {
-    return Math.hypot(x1 - x2, y1 - y2);
-}
-
-function shuffle24(arr) {
+function shuffle26(arr) {
     for (let i = arr.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [arr[i], arr[j]] = [arr[j], arr[i]];
@@ -366,33 +426,7 @@ function shuffle24(arr) {
     return arr;
 }
 
-function lighten24(hex, amount) {
-    const num = parseInt(hex.slice(1), 16);
-    let r = (num >> 16) & 255;
-    let g = (num >> 8) & 255;
-    let b = num & 255;
-
-    r = Math.min(255, Math.floor(r + 255 * amount));
-    g = Math.min(255, Math.floor(g + 255 * amount));
-    b = Math.min(255, Math.floor(b + 255 * amount));
-
-    return `rgb(${r},${g},${b})`;
-}
-
-function darken24(hex, amount) {
-    const num = parseInt(hex.slice(1), 16);
-    let r = (num >> 16) & 255;
-    let g = (num >> 8) & 255;
-    let b = num & 255;
-
-    r = Math.max(0, Math.floor(r - 255 * amount));
-    g = Math.max(0, Math.floor(g - 255 * amount));
-    b = Math.max(0, Math.floor(b - 255 * amount));
-
-    return `rgb(${r},${g},${b})`;
-}
-
-function setMsg24(text) {
-    const el = document.getElementById("msg24");
+function setMsg26(text) {
+    const el = document.getElementById("msg26");
     if (el) el.textContent = text;
 }

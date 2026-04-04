@@ -11,6 +11,71 @@ const nextBtn = document.getElementById("nextBtn");
 const levelTitle = document.getElementById("levelTitle");
 const container = document.getElementById("gameContainer");
 
+const decorativeLayout = [
+  { selector: ".side-canard", side: "left", row: 0, scale: 0.96, rotate: -12 },
+  { selector: ".side-planete", side: "right", row: 0, scale: 0.92, rotate: -10 },
+  { selector: ".side-fantome", side: "left", row: 1, scale: 0.9, rotate: 8 },
+  { selector: ".side-pizza", side: "right", row: 1, scale: 0.95, rotate: -16 },
+  { selector: ".side-manette2", side: "left", row: 2, scale: 0.84, rotate: -10 },
+  { selector: ".side-bloc", side: "right", row: 2, scale: 0.92, rotate: -8 },
+  { selector: ".side-manette", side: "left", row: 3, scale: 0.92, rotate: 10 },
+  { selector: ".side-martien", side: "right", row: 3, scale: 0.9, rotate: 8 },
+  { selector: ".side-pacman-echo", side: "left", row: 4, scale: 0.72, rotate: -14 },
+  { selector: ".side-fusee", side: "right", row: 4, scale: 0.86, rotate: 22 },
+  { selector: ".side-pizza-echo", side: "left", row: 5, scale: 0.66, rotate: 11 },
+  { selector: ".side-planete-echo", side: "right", row: 5, scale: 0.68, rotate: 9 },
+  { selector: ".side-pacman", side: "right", row: 6, scale: 0.88, rotate: 14 },
+];
+
+function layoutDecorativeImages() {
+  const items = decorativeLayout
+    .map((entry) => ({ ...entry, element: document.querySelector(entry.selector) }))
+    .filter((entry) => entry.element);
+
+  if (items.length === 0) return;
+
+  const viewportHeight = window.innerHeight;
+  const viewportWidth = window.innerWidth;
+  const marginY = Math.max(42, Math.round(viewportHeight * 0.075));
+  const sideInset = Math.max(18, Math.round(viewportWidth * 0.022));
+  const imageSize = Math.max(92, Math.min(150, Math.round(viewportWidth * 0.105)));
+
+  const grouped = items.reduce(
+    (accumulator, item) => {
+      accumulator[item.side].push(item);
+      return accumulator;
+    },
+    { left: [], right: [] },
+  );
+
+  const placeColumn = (columnItems, side) => {
+    const count = columnItems.length;
+    const usableHeight = viewportHeight - marginY * 2;
+    const gap = count > 0 ? usableHeight / (count + 1) : usableHeight;
+    const clippedOffset = Math.max(18, Math.round(imageSize * 0.28));
+
+    columnItems
+        .sort((a, b) => a.row - b.row)
+      .forEach((item, index) => {
+        const centerY = marginY + gap * (index + 1);
+        const alternatingWobble = index % 2 === 0 ? -4 : 4;
+        const horizontalOffset = -(sideInset + (index % 3 === 0 ? clippedOffset : clippedOffset * 0.45));
+
+        item.element.style.width = `${imageSize}px`;
+        item.element.style.height = `${imageSize}px`;
+        item.element.style.top = `${centerY}px`;
+        item.element.style[side] = `${horizontalOffset}px`;
+        item.element.style.transform = `translateY(-50%) rotate(${item.rotate + alternatingWobble}deg) scale(${item.scale})`;
+        item.element.style.zIndex = String(10 + index);
+      });
+  };
+
+  placeColumn(grouped.left, "left");
+  placeColumn(grouped.right, "right");
+}
+
+window.addEventListener("resize", layoutDecorativeImages);
+
 function getGameFilePath(levelGameId) {
   return `./games/${levelGameId}.js`;
 }
@@ -95,5 +160,7 @@ function previousLevel() {
 startBtn.addEventListener("click", startGameFlow);
 nextBtn.addEventListener("click", nextLevel);
 prevBtn.addEventListener("click", previousLevel);
+
+layoutDecorativeImages();
 
 window.startGame = startGameFlow;

@@ -46,12 +46,12 @@ body {
 }
 
 .nebula-layer,
-.stars-layer {
+.stars-layer,
+.twinkle-layer {
   position: fixed;
   inset: -10%;
   pointer-events: none;
 }
-
 
 .nebula-layer {
   z-index: -3;
@@ -98,6 +98,68 @@ body {
   animation-delay: 4s;
 }
 
+.twinkle-layer {
+  z-index: -1;
+  inset: 0;
+  opacity: 0.82;
+  mix-blend-mode: screen;
+}
+
+.twinkle-layer,
+.twinkle-layer::before,
+.twinkle-layer::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-repeat: no-repeat;
+  filter: drop-shadow(0 0 1.5px rgba(255, 255, 255, 0.35));
+}
+
+.twinkle-layer {
+  background:
+    radial-gradient(circle at 50% 46%, rgba(6, 7, 20, 0.62) 0 18%, rgba(6, 7, 20, 0.36) 34%, rgba(6, 7, 20, 0) 60%) 0 0 / 100% 100% no-repeat,
+    radial-gradient(circle, rgba(255, 255, 255, 0.8) 0, rgba(255, 255, 255, 0.8) 1.05px, transparent 1.25px) 0 0 / 96px 96px repeat,
+    radial-gradient(circle, rgba(218, 232, 255, 0.66) 0, rgba(218, 232, 255, 0.66) 0.95px, transparent 1.15px) 23px 37px / 128px 128px repeat,
+    radial-gradient(circle, rgba(255, 255, 255, 0.72) 0, rgba(255, 255, 255, 0.72) 0.95px, transparent 1.15px) 79px 61px / 138px 138px repeat,
+    radial-gradient(circle, rgba(255, 79, 216, 0.38) 0, rgba(255, 79, 216, 0.38) 0.85px, transparent 1.05px) 41px 19px / 220px 220px repeat,
+    radial-gradient(circle, rgba(46, 232, 255, 0.42) 0, rgba(46, 232, 255, 0.42) 0.85px, transparent 1.05px) 67px 53px / 260px 260px repeat,
+    radial-gradient(4.8px 4.8px at 12% 9%, rgba(255, 255, 255, 0.95) 46%, transparent 56%),
+    radial-gradient(5.6px 5.6px at 64% 15%, rgba(241, 248, 255, 0.94) 46%, transparent 56%),
+    radial-gradient(6.4px 6.4px at 83% 76%, rgba(255, 255, 255, 0.95) 44%, transparent 54%);
+  animation: twinkle-static-a 9.7s ease-in-out infinite;
+  animation-delay: -1.8s;
+}
+
+.twinkle-layer::before {
+  background:
+    radial-gradient(circle at 50% 46%, rgba(6, 7, 20, 0.48) 0 17%, rgba(6, 7, 20, 0.28) 33%, rgba(6, 7, 20, 0) 58%) 0 0 / 100% 100% no-repeat,
+    radial-gradient(circle, rgba(255, 255, 255, 0.72) 0, rgba(255, 255, 255, 0.72) 0.95px, transparent 1.15px) 11px 7px / 110px 110px repeat,
+    radial-gradient(circle, rgba(210, 226, 255, 0.62) 0, rgba(210, 226, 255, 0.62) 0.85px, transparent 1.05px) 37px 29px / 150px 150px repeat,
+    radial-gradient(circle, rgba(255, 255, 255, 0.66) 0, rgba(255, 255, 255, 0.66) 0.9px, transparent 1.1px) 93px 47px / 170px 170px repeat,
+    radial-gradient(circle, rgba(255, 79, 216, 0.34) 0, rgba(255, 79, 216, 0.34) 0.8px, transparent 1px) 83px 43px / 260px 260px repeat,
+    radial-gradient(circle, rgba(46, 232, 255, 0.37) 0, rgba(46, 232, 255, 0.37) 0.8px, transparent 1px) 15px 77px / 300px 300px repeat,
+    radial-gradient(4.6px 4.6px at 18% 73%, rgba(255, 255, 255, 0.9) 46%, transparent 56%),
+    radial-gradient(6px 6px at 54% 83%, rgba(242, 248, 255, 0.9) 46%, transparent 56%),
+    radial-gradient(6.8px 6.8px at 89% 21%, rgba(255, 255, 255, 0.92) 44%, transparent 54%);
+  animation: twinkle-static-b 13.4s ease-in-out infinite;
+  animation-delay: -6.1s;
+}
+
+.twinkle-layer::after {
+  background:
+    radial-gradient(circle at 50% 46%, rgba(6, 7, 20, 0.42) 0 16%, rgba(6, 7, 20, 0.24) 31%, rgba(6, 7, 20, 0) 56%) 0 0 / 100% 100% no-repeat,
+    radial-gradient(circle, rgba(255, 255, 255, 0.68) 0, rgba(255, 255, 255, 0.68) 0.9px, transparent 1.1px) 5px 33px / 120px 120px repeat,
+    radial-gradient(circle, rgba(211, 227, 255, 0.6) 0, rgba(211, 227, 255, 0.6) 0.8px, transparent 1px) 41px 57px / 170px 170px repeat,
+    radial-gradient(circle, rgba(255, 255, 255, 0.62) 0, rgba(255, 255, 255, 0.62) 0.85px, transparent 1.05px) 117px 41px / 190px 190px repeat,
+    radial-gradient(circle, rgba(255, 79, 216, 0.32) 0, rgba(255, 79, 216, 0.32) 0.75px, transparent 0.95px) 71px 17px / 280px 280px repeat,
+    radial-gradient(circle, rgba(46, 232, 255, 0.34) 0, rgba(46, 232, 255, 0.34) 0.75px, transparent 0.95px) 101px 49px / 340px 340px repeat,
+    radial-gradient(4.2px 4.2px at 7% 90%, rgba(255, 255, 255, 0.9) 46%, transparent 56%),
+    radial-gradient(5.8px 5.8px at 46% 88%, rgba(241, 248, 255, 0.9) 46%, transparent 56%),
+    radial-gradient(7.2px 7.2px at 79% 9%, rgba(255, 255, 255, 0.93) 44%, transparent 54%);
+  animation: twinkle-static-c 7.9s ease-in-out infinite;
+  animation-delay: -3.7s;
+}
 .home-screen,
 .play-area {
   width: min(900px, calc(100% - 48px));
@@ -175,10 +237,10 @@ body {
   font-weight: 400;
   font-style: normal;
   font-variation-settings: "BLED" 0, "SCAN" 0, "XELA" 0, "YELA" 0;
-  color: #6ff7ff;
+  color: #3a0eff;
   text-shadow:
-    0 0 6px rgba(111, 247, 255, 0.95),
-    0 0 16px rgba(46, 232, 255, 0.65);
+    0 0 6px rgba(29, 6, 240, 0.95),
+    0 0 16px rgb(255, 0, 0);
   font-size: 1rem;
   letter-spacing: 0.08rem;
 }
@@ -192,7 +254,7 @@ body {
 
 button {
   border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #f9f9ff;
+  color: #fdf9ff;
   background: linear-gradient(130deg, rgba(127, 73, 255, 0.85), rgba(255, 79, 216, 0.78));
   border-radius: 12px;
   cursor: pointer;
@@ -233,7 +295,7 @@ button:active {
 
 .tetris-side {
   position: fixed;
-  top: 8vh;
+  top: 30vh;
   width: 160px;
   display: flex;
   flex-direction: column;
@@ -286,44 +348,110 @@ button:active {
 
 .side-canard {
   background-image: url("./assets/images/Fond_canard.png");
-  left: -56px;
-  top: 10%;
-  transform: rotate(-16deg) scaleX(-1);
+  left: -28px;
+  top: 7%;
+  transform: rotate(-13deg) scaleX(-1) scale(0.98);
 }
 
 .side-manette {
   background-image: url("./assets/images/fond_manette.png");
   left: -62px;
-  top: 78%;
-  transform: rotate(12deg) scaleX(-1);
+  top: 66%;
+  transform: rotate(10deg) scaleX(-1) scale(0.94);
+}
+
+.side-manette2 {
+  background-blend-mode: multiply;
+  left: -66px;
+  top: 50%;
+  transform: rotate(-10deg) scale(0.82);
+  width: clamp(98px, 12vw, 165px);
+  opacity: 0.54;
+  border-radius: 14px;
 }
 
 .side-bloc {
   background-image: url("./assets/images/Fond_bloc.png");
-  right: -56px;
-  top: 50%;
-  transform: rotate(-13deg);
+  right: -60px;
+  top: 37%;
+  transform: rotate(-10deg) scale(0.96);
 }
 
 .side-fantome {
   background-image: url("./assets/images/fond_fantome.png");
-  left: -52px;
-  top: 44%;
-  transform: rotate(8deg) scaleX(-1);
+  left: -58px;
+  top: 36%;
+  transform: rotate(8deg) scaleX(-1) scale(0.95);
+}
+
+.side-martien {
+  background-image: url("./assets/images/fond_martien.png");
+  right: -58px;
+  top: 65%;
+  transform: rotate(8deg) scale(0.88);
+  width: clamp(108px, 12vw, 188px);
+  opacity: 0.56;
+}
+
+.side-planete {
+  background-image: url("./assets/images/Fonds_planete.png");
+  left: -40px;
+  top: 50%;
+  transform: rotate(-11deg) scale(0.96);
+  width: clamp(112px, 13vw, 188px);
+  opacity: 0.46;
+}
+
+.side-fusee {
+  background-image: url("./assets/images/fond_fus%C3%A9e.png");
+  right: -62px;
+  top: 79%;
+  transform: rotate(23deg) scale(0.84);
+  width: clamp(86px, 10vw, 142px);
+  opacity: 0.56;
 }
 
 .side-pizza {
   background-image: url("./assets/images/fond_pizza.png");
-  right: -58px;
-  top: 14%;
-  transform: rotate(-10deg);
+  right: -64px;
+  top: 9%;
+  transform: rotate(-17deg) scale(1.4);
+  width: clamp(104px, 12vw, 172px);
+  opacity: 0.6;
+}
+
+.side-pizza-echo {
+  background-image: url("./assets/images/fond_pizza.png");
+  right: -48px;
+  top: 23%;
+  transform: rotate(10deg) scale(0.62);
+  width: clamp(82px, 8vw, 120px);
+  opacity: 0.34;
 }
 
 .side-pacman {
   background-image: url("./assets/images/fond_pacman.png");
-  right: -54px;
+  right: -12px;
+  top: 85%;
+  transform: rotate(12deg) scale(1.1);
+}
+
+.side-pacman-echo {
+  background-image: url("./assets/images/fond_pacman.png");
+  left: -32px;
   top: 82%;
-  transform: rotate(16deg);
+  transform: rotate(-16deg) scale(0.68);
+  width: clamp(78px, 8vw, 116px);
+  opacity: 0.3;
+}
+
+.side-planete-echo {
+  background-image: url("./assets/images/Fonds_planete.png");
+  right: -2px;
+  top: 4%;
+  transform: rotate(9deg) scale(0.64);
+  width: clamp(90px, 10vw, 138px);
+  opacity: 0.28;
 }
 
 .t-shape {
@@ -405,7 +533,7 @@ canvas {
 
 .colorBox:hover {
   transform: scale(1.1);
-  box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 15px rgba(0, 18, 221, 0.8);
 }
 
 #feedback {
@@ -447,11 +575,13 @@ body.in-game .start-btn {
   filter: drop-shadow(0 0 12px rgba(255,255,255,0.9));
 }
 
+
+
 .neon-controller { background-image: url('./assets/neon/controller.png'); top: 12%; left: 18%; }
 .neon-duck       { background-image: url('./assets/neon/duck.png');       top: 42%; left: 8%; }
-.neon-pizza      { background-image: url('./assets/neon/pizza.png');      top: 70%; left: 22%; }
+.neon-pizza      { background-image: url('./assets/neon/pizza.png');      top: 25%; left: 22%; }
 .neon-cassette   { background-image: url('./assets/neon/cassette.png');   top: 18%; right: 12%; }
-.neon-invader    { background-image: url('./assets/neon/invader.png');    top: 60%; right: 18%; }
+.neon-invader    { background-image: url('./assets/neon/invader.png');    top: 80%; right: 18%; }
 
 @keyframes float {
   0%, 100% { transform: translateY(0); }
@@ -482,6 +612,63 @@ body.in-game .start-btn {
   100% {
     transform: translate3d(120vw, 42vh, 0) rotate(-26deg);
     opacity: 0;
+  }
+}
+
+@keyframes twinkle-static-a {
+  0%,
+  100% {
+    opacity: 0.36;
+  }
+  16% {
+    opacity: 0.62;
+  }
+  39% {
+    opacity: 0.44;
+  }
+  67% {
+    opacity: 0.74;
+  }
+  86% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes twinkle-static-b {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  23% {
+    opacity: 0.58;
+  }
+  51% {
+    opacity: 0.4;
+  }
+  79% {
+    opacity: 0.66;
+  }
+  92% {
+    opacity: 0.46;
+  }
+}
+
+@keyframes twinkle-static-c {
+  0%,
+  100% {
+    opacity: 0.28;
+  }
+  12% {
+    opacity: 0.5;
+  }
+  36% {
+    opacity: 0.34;
+  }
+  61% {
+    opacity: 0.6;
+  }
+  84% {
+    opacity: 0.42;
   }
 }
 
@@ -538,21 +725,49 @@ body.in-game .start-btn {
   }
 
   .side-canard,
-  .side-manette {
-    left: -48px;
+  .side-manette,
+  .side-planete {
+    left: -200px;
   }
 
   .side-bloc {
-    right: -48px;
+    right: -44px;
   }
 
   .side-pizza,
   .side-pacman {
-    right: -46px;
+    right: -40px;
   }
 
+  .side-pizza-echo,
+  .side-planete-echo,
+  .side-pacman-echo,
+
+
   .side-fantome {
-    left: -44px;
+    left: -20px;
+  }
+
+  .side-martien,
+  .side-fusee {
+    opacity: 0.38;
+  }
+
+  .side-fusee {
+    right: -35px;
+    top: 80%;
+  }
+
+  .side-planete {
+    left: -16px;
+    top: 24%;
+    transform: rotate(-10deg) scale(1.2);
+  }
+
+  .side-martien {
+    right: -20px;
+    top: 62%;
+    transform: rotate(9deg) scale(0.86);
   }
 
   .home-screen,

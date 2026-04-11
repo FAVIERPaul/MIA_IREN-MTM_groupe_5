@@ -11,24 +11,26 @@ const nextBtn = document.getElementById("nextBtn");
 const levelTitle = document.getElementById("levelTitle");
 const container = document.getElementById("gameContainer");
 
-const decorativeLayout = [
-  { selector: ".side-canard", side: "left", row: 0, scale: 0.96, rotate: -12 },
+// Single source of truth for decorative image placement around the viewport.
+const DECORATIVE_IMAGE_LAYOUT = [
+  { selector: ".side-canard", side: "left", row: -2, scale: 0.96, rotate: -12 },
   { selector: ".side-planete", side: "right", row: 0, scale: 0.92, rotate: -10 },
   { selector: ".side-fantome", side: "left", row: 1, scale: 0.9, rotate: 8 },
   { selector: ".side-pizza", side: "right", row: 1, scale: 0.95, rotate: -16 },
   { selector: ".side-manette2", side: "left", row: 2, scale: 0.84, rotate: -10 },
   { selector: ".side-bloc", side: "right", row: 2, scale: 0.92, rotate: -8 },
-  { selector: ".side-manette", side: "left", row: 3, scale: 0.92, rotate: 10 },
+   { selector: ".side-bloc2", side: "left", row: 2, scale: 0.92, rotate: -8 },
+  { selector: ".side-manette", side: "right", row: 3, scale: 0.92, rotate: 10 },
   { selector: ".side-martien", side: "right", row: 3, scale: 0.9, rotate: 8 },
   { selector: ".side-pacman-echo", side: "left", row: 4, scale: 0.72, rotate: -14 },
   { selector: ".side-fusee", side: "right", row: 4, scale: 0.86, rotate: 22 },
   { selector: ".side-pizza-echo", side: "left", row: 5, scale: 0.66, rotate: 11 },
-  { selector: ".side-planete-echo", side: "right", row: 5, scale: 0.68, rotate: 9 },
+  { selector: ".side-planete-echo", side: "left", row: 5, scale: 0.68, rotate: 9 },
   { selector: ".side-pacman", side: "right", row: 6, scale: 0.88, rotate: 14 },
 ];
 
-function layoutDecorativeImages() {
-  const items = decorativeLayout
+function applyDecorativeImageLayout() {
+  const items = DECORATIVE_IMAGE_LAYOUT
     .map((entry) => ({ ...entry, element: document.querySelector(entry.selector) }))
     .filter((entry) => entry.element);
 
@@ -55,7 +57,7 @@ function layoutDecorativeImages() {
     const clippedOffset = Math.max(18, Math.round(imageSize * 0.28));
 
     columnItems
-        .sort((a, b) => a.row - b.row)
+      .sort((a, b) => a.row - b.row)
       .forEach((item, index) => {
         const centerY = marginY + gap * (index + 1);
         const alternatingWobble = index % 2 === 0 ? -4 : 4;
@@ -74,7 +76,7 @@ function layoutDecorativeImages() {
   placeColumn(grouped.right, "right");
 }
 
-window.addEventListener("resize", layoutDecorativeImages);
+window.addEventListener("resize", applyDecorativeImageLayout);
 
 function getGameFilePath(levelGameId) {
   return `./games/${levelGameId}.js`;
@@ -161,6 +163,6 @@ startBtn.addEventListener("click", startGameFlow);
 nextBtn.addEventListener("click", nextLevel);
 prevBtn.addEventListener("click", previousLevel);
 
-layoutDecorativeImages();
+applyDecorativeImageLayout();
 
 window.startGame = startGameFlow;

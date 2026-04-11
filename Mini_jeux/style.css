@@ -346,25 +346,19 @@ button:active {
   filter: drop-shadow(0 0 12px rgba(46, 232, 255, 0.4));
 }
 
+/* Position and transform are managed in main.js (decorativeLayout). */
+
 .side-canard {
   background-image: url("./assets/images/Fond_canard.png");
-  left: -28px;
-  top: 7%;
-  transform: rotate(-13deg) scaleX(-1) scale(0.98);
 }
 
 .side-manette {
   background-image: url("./assets/images/fond_manette.png");
-  left: -62px;
-  top: 66%;
-  transform: rotate(10deg) scaleX(-1) scale(0.94);
 }
 
 .side-manette2 {
+  background-image: url("./assets/images/fond_manette.png");
   background-blend-mode: multiply;
-  left: -66px;
-  top: 50%;
-  transform: rotate(-10deg) scale(0.82);
   width: clamp(98px, 12vw, 165px);
   opacity: 0.54;
   border-radius: 14px;
@@ -372,84 +366,54 @@ button:active {
 
 .side-bloc {
   background-image: url("./assets/images/Fond_bloc.png");
-  right: -60px;
-  top: 37%;
-  transform: rotate(-10deg) scale(0.96);
 }
 
 .side-fantome {
   background-image: url("./assets/images/fond_fantome.png");
-  left: -58px;
-  top: 36%;
-  transform: rotate(8deg) scaleX(-1) scale(0.95);
 }
 
 .side-martien {
   background-image: url("./assets/images/fond_martien.png");
-  right: -58px;
-  top: 65%;
-  transform: rotate(8deg) scale(0.88);
   width: clamp(108px, 12vw, 188px);
   opacity: 0.56;
 }
 
 .side-planete {
   background-image: url("./assets/images/Fonds_planete.png");
-  left: -40px;
-  top: 50%;
-  transform: rotate(-11deg) scale(0.96);
   width: clamp(112px, 13vw, 188px);
   opacity: 0.46;
 }
 
 .side-fusee {
   background-image: url("./assets/images/fond_fus%C3%A9e.png");
-  right: -62px;
-  top: 79%;
-  transform: rotate(23deg) scale(0.84);
   width: clamp(86px, 10vw, 142px);
   opacity: 0.56;
 }
 
 .side-pizza {
   background-image: url("./assets/images/fond_pizza.png");
-  right: -64px;
-  top: 9%;
-  transform: rotate(-17deg) scale(1.4);
   width: clamp(104px, 12vw, 172px);
   opacity: 0.6;
 }
 
 .side-pizza-echo {
   background-image: url("./assets/images/fond_pizza.png");
-  right: -48px;
-  top: 23%;
-  transform: rotate(10deg) scale(0.62);
   width: clamp(82px, 8vw, 120px);
   opacity: 0.34;
 }
 
 .side-pacman {
   background-image: url("./assets/images/fond_pacman.png");
-  right: -12px;
-  top: 85%;
-  transform: rotate(12deg) scale(1.1);
 }
 
 .side-pacman-echo {
   background-image: url("./assets/images/fond_pacman.png");
-  left: -32px;
-  top: 82%;
-  transform: rotate(-16deg) scale(0.68);
   width: clamp(78px, 8vw, 116px);
   opacity: 0.3;
 }
 
 .side-planete-echo {
   background-image: url("./assets/images/Fonds_planete.png");
-  right: -2px;
-  top: 4%;
-  transform: rotate(9deg) scale(0.64);
   width: clamp(90px, 10vw, 138px);
   opacity: 0.28;
 }
@@ -724,50 +688,9 @@ body.in-game .start-btn {
     opacity: 0.5;
   }
 
-  .side-canard,
-  .side-manette,
-  .side-planete {
-    left: -200px;
-  }
-
-  .side-bloc {
-    right: -44px;
-  }
-
-  .side-pizza,
-  .side-pacman {
-    right: -40px;
-  }
-
-  .side-pizza-echo,
-  .side-planete-echo,
-  .side-pacman-echo,
-
-
-  .side-fantome {
-    left: -20px;
-  }
-
   .side-martien,
   .side-fusee {
     opacity: 0.38;
-  }
-
-  .side-fusee {
-    right: -35px;
-    top: 80%;
-  }
-
-  .side-planete {
-    left: -16px;
-    top: 24%;
-    transform: rotate(-10deg) scale(1.2);
-  }
-
-  .side-martien {
-    right: -20px;
-    top: 62%;
-    transform: rotate(9deg) scale(0.86);
   }
 
   .home-screen,

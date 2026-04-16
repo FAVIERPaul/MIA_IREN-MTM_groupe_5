@@ -1,197 +1,165 @@
-let game17 = {};
+let game14 = {};
 
-export function startGame17(container, onFinish) {
+export function startGame16(container, onFinish) {
     container.innerHTML = `
-        <div style="text-align:center; font-family: 'Segoe UI', sans-serif; color: white; background: #1a1a1a; padding: 20px; border-radius: 15px;">
-            <div style="font-size: 1.2em; margin-bottom: 10px;">🌀 Mouvements : <span id="moves17" style="color: #2ecc71;">0</span></div>
-            <canvas id="cubeCanvas" width="360" height="360" style="border: 4px solid #34495e; border-radius: 8px; box-shadow: 0 0 20px rgba(0,0,0,0.5); cursor: pointer;"></canvas>
-            <p id="msg17" style="margin-top: 15px; font-weight: bold; min-height: 24px;">Réorganise par lignes ou colonnes monochromes.</p>
+        <div style="
+            text-align:center;
+            font-family: 'Segoe UI', sans-serif;
+            color: #e0f7ff;
+            background: radial-gradient(circle at top, #0a0f1f, #000);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 0 40px rgba(0, 200, 255, 0.25);
+        ">
+            <div style="
+                font-size: 1.3em;
+                margin-bottom: 12px;
+                color: #6beaff;
+                text-shadow: 0 0 8px #00eaff;
+            ">
+                🔢 Mouvements : <span id="moves14" style="color: #00ffc8;">0</span>
+            </div>
+
+            <canvas id="taquinCanvas" width="360" height="360" style="
+                border: 3px solid rgba(0, 255, 255, 0.4);
+                border-radius: 12px;
+                box-shadow: 0 0 25px rgba(0, 255, 255, 0.25);
+                cursor: pointer;
+                background: rgba(255,255,255,0.03);
+                backdrop-filter: blur(6px);
+            "></canvas>
+
+            <p id="msg14" style="
+                margin-top: 18px;
+                font-weight: bold;
+                min-height: 24px;
+                color: #7be8ff;
+                text-shadow: 0 0 6px #00eaff;
+            ">
+                Réorganisez les nombres premiers !
+            </p>
         </div>
     `;
 
-    const canvas = container.querySelector("#cubeCanvas");
+    const canvas = container.querySelector("#taquinCanvas");
     const ctx = canvas.getContext("2d");
 
-    game17 = {
-        ctx,
-        canvas,
+    game14 = {
+        ctx, canvas,
         size: 4,
-        tileSize: canvas.width / 4,
+        tileSize: 90,
         grid: [],
+        empty: { x: 3, y: 3 },
         moves: 0,
         onFinish,
-        dragging: false,
-        dragStart: null
+        status: "PLAYING"
     };
 
-    initCube();
-    mixCube();
-    renderCube();
-
-    canvas.addEventListener("mousedown", startDrag);
-    canvas.addEventListener("mouseup", endDrag);
+    initTaquin();
+    canvas.addEventListener("click", clickTaquin);
+    renderTaquin();
 }
 
-/* ---------- INIT ---------- */
+/* ------------------ INIT ------------------ */
 
-function initCube() {
-    const colors = ["#e74c3c", "#3498db", "#f1c40f", "#2ecc71"];
-
-    for (let row = 0; row < 4; row++) {
-        for (let col = 0; col < 4; col++) {
-            game17.grid[row * 4 + col] = colors[row];
-        }
-    }
+function initTaquin() {
+    const primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47];
+    game14.grid = primes.sort(() => Math.random() - 0.5);
+    game14.grid.push(null);
 }
 
-/* ---------- MIX ---------- */
+/* ------------------ CLICK ------------------ */
 
-function mixCube() {
-    for (let i = 0; i < 25; i++) {
-        if (Math.random() < 0.5) {
-            const row = Math.floor(Math.random() * 4);
-            slideRow(row, Math.random() < 0.5 ? 1 : -1, false);
-        } else {
-            const col = Math.floor(Math.random() * 4);
-            slideCol(col, Math.random() < 0.5 ? 1 : -1, false);
-        }
-    }
-}
+function clickTaquin(e) {
+    if (game14.status !== "PLAYING") return;
 
-/* ---------- DRAG ---------- */
-
-function startDrag(e) {
-    const rect = game17.canvas.getBoundingClientRect();
+    const rect = game14.canvas.getBoundingClientRect();
     const mx = e.clientX - rect.left;
     const my = e.clientY - rect.top;
 
-    const x = Math.floor(mx / game17.tileSize);
-    const y = Math.floor(my / game17.tileSize);
+    const x = Math.floor(mx / game14.tileSize);
+    const y = Math.floor(my / game14.tileSize);
 
-    game17.dragging = true;
-    game17.dragStart = { x, y, mx, my };
+    moveTile(x, y);
 }
 
-function endDrag(e) {
-    if (!game17.dragging) return;
-    game17.dragging = false;
+/* ------------------ MOVE ------------------ */
 
-    const rect = game17.canvas.getBoundingClientRect();
-    const mx = e.clientX - rect.left;
-    const my = e.clientY - rect.top;
+function moveTile(x, y) {
+    const ex = game14.empty.x;
+    const ey = game14.empty.y;
 
-    const dx = mx - game17.dragStart.mx;
-    const dy = my - game17.dragStart.my;
+    const isAdjacent =
+        (x === ex && Math.abs(y - ey) === 1) ||
+        (y === ey && Math.abs(x - ex) === 1);
 
-    const row = game17.dragStart.y;
-    const col = game17.dragStart.x;
+    if (!isAdjacent) return;
 
-    if (Math.abs(dx) > Math.abs(dy)) {
-        if (dx > 10) slideRow(row, 1, true);
-        else if (dx < -10) slideRow(row, -1, true);
-    } else {
-        if (dy > 10) slideCol(col, 1, true);
-        else if (dy < -10) slideCol(col, -1, true);
-    }
+    const idx1 = y * 4 + x;
+    const idx2 = ey * 4 + ex;
+
+    [game14.grid[idx1], game14.grid[idx2]] = [game14.grid[idx2], game14.grid[idx1]];
+
+    game14.empty = { x, y };
+    game14.moves++;
+
+    document.getElementById("moves14").textContent = game14.moves;
+
+    renderTaquin();
+    checkPrimeWin();
 }
 
-/* ---------- SLIDE ROW ---------- */
+/* ------------------ CHECK WIN ------------------ */
 
-function slideRow(row, dir, countMove) {
-    const size = game17.size;
-    const start = row * size;
-    const line = game17.grid.slice(start, start + size);
+function checkPrimeWin() {
+    const primesOrdered = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47];
 
-    if (dir === 1) line.unshift(line.pop());
-    else line.push(line.shift());
-
-    for (let i = 0; i < size; i++) game17.grid[start + i] = line[i];
-
-    if (countMove) {
-        game17.moves++;
-        document.getElementById("moves17").textContent = game17.moves;
-        checkCubeWin();
+    for (let i = 0; i < 15; i++) {
+        if (game14.grid[i] !== primesOrdered[i]) return;
     }
 
-    renderCube();
+    if (game14.grid[15] !== null) return;
+
+    game14.status = "WIN";
+    document.getElementById("msg14").textContent =
+        "✨ Interface réorganisée avec succès !";
+
+    setTimeout(game14.onFinish, 1500);
 }
 
-/* ---------- SLIDE COL ---------- */
+/* ------------------ RENDER ------------------ */
 
-function slideCol(col, dir, countMove) {
-    const size = game17.size;
-    const colVals = [];
-    for (let i = 0; i < size; i++) colVals.push(game17.grid[i * size + col]);
+function renderTaquin() {
+    const ctx = game14.ctx;
+    ctx.fillStyle = "#000a14";
+    ctx.fillRect(0, 0, 360, 360);
 
-    if (dir === 1) colVals.unshift(colVals.pop());
-    else colVals.push(colVals.shift());
+    for (let i = 0; i < 16; i++) {
+        const val = game14.grid[i];
+        const x = (i % 4) * game14.tileSize;
+        const y = Math.floor(i / 4) * game14.tileSize;
 
-    for (let i = 0; i < size; i++) game17.grid[i * size + col] = colVals[i];
+        if (val === null) continue;
 
-    if (countMove) {
-        game17.moves++;
-        document.getElementById("moves17").textContent = game17.moves;
-        checkCubeWin();
-    }
+        // Tuile futuriste
+        ctx.fillStyle = "rgba(0, 255, 255, 0.15)";
+        ctx.strokeStyle = "rgba(0, 255, 255, 0.6)";
+        ctx.lineWidth = 3;
 
-    renderCube();
-}
+        ctx.beginPath();
+        ctx.roundRect(x + 6, y + 6, 78, 78, 10);
+        ctx.fill();
+        ctx.stroke();
 
-/* ---------- CHECK WIN ---------- */
+        // Glow interne
+        ctx.shadowColor = "#00eaff";
+        ctx.shadowBlur = 12;
 
-function checkCubeWin() {
-    const size = game17.size;
+        // Texte néon
+        ctx.fillStyle = "#e0ffff";
+        ctx.font = "bold 28px 'Segoe UI'";
+        ctx.fillText(val, x + 30, y + 55);
 
-    // Toutes les lignes monochromes ?
-    let allRowsMono = true;
-    for (let row = 0; row < size; row++) {
-        const start = row * size;
-        const color = game17.grid[start];
-        for (let col = 0; col < size; col++) {
-            if (game17.grid[start + col] !== color) {
-                allRowsMono = false;
-                break;
-            }
-        }
-        if (!allRowsMono) break;
-    }
-
-    // Toutes les colonnes monochromes ?
-    let allColsMono = true;
-    for (let col = 0; col < size; col++) {
-        const color = game17.grid[col];
-        for (let row = 0; row < size; row++) {
-            if (game17.grid[row * size + col] !== color) {
-                allColsMono = false;
-                break;
-            }
-        }
-        if (!allColsMono) break;
-    }
-
-    if (allRowsMono || allColsMono) {
-        document.getElementById("msg17").textContent =
-            "🎉 Bravo ! Toutes les lignes OU toutes les colonnes sont monochromes !";
-        setTimeout(game17.onFinish, 1500);
-    }
-}
-
-/* ---------- RENDER ---------- */
-
-function renderCube() {
-    const ctx = game17.ctx;
-    const size = game17.size;
-    const tile = game17.tileSize;
-
-    ctx.fillStyle = "#2c3e50";
-    ctx.fillRect(0, 0, game17.canvas.width, game17.canvas.height);
-
-    for (let i = 0; i < size * size; i++) {
-        const color = game17.grid[i];
-        const x = (i % size) * tile;
-        const y = Math.floor(i / size) * tile;
-
-        ctx.fillStyle = color;
-        ctx.fillRect(x + 5, y + 5, tile - 10, tile - 10);
+        ctx.shadowBlur = 0;
     }
 }

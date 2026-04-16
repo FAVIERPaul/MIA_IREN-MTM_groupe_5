@@ -1,13 +1,13 @@
 import { createInputField, createValidationButton, createFeedbackDiv, setFeedback } from "../gameInterface.js";
 
-export function startGame10(container, onFinish) {
+export function startGame28(container, onFinish) {
   const levels = [
+  
   {
-    question: "2, 4, 8, 16, ?",
-    answer: "32",
-    hint: "Simple multiplication : chaque terme est multiplié par 2."
-  },
-  ];
+    question: "A, C, F, J, ?",
+    answer: "O",
+    hint: "Positions de l'alphabet : 1 → 3 → 6 → 10 → 15."
+  }]
   container.innerHTML = "";
 
   const title = document.createElement("h2");

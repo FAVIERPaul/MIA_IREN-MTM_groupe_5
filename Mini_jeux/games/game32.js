@@ -2,11 +2,13 @@ import { createInputField, createValidationButton, createFeedbackDiv, setFeedbac
 
 export function startGame10(container, onFinish) {
   const levels = [
+  
+
   {
     question: "2, 4, 8, 16, ?",
-    answer: "32",
-    hint: "Simple multiplication : chaque terme est multiplié par 2."
-  },
+    answer: "?",
+    hint: "Cette fois on brise le pattern : double → rupture. Réponse attendue exacte ' ? '."
+  }
   ];
   container.innerHTML = "";
 

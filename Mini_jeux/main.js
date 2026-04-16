@@ -39,41 +39,28 @@ function applyDecorativeImageLayout() {
   const viewportHeight = window.innerHeight;
   const viewportWidth = window.innerWidth;
   const marginY = Math.max(42, Math.round(viewportHeight * 0.075));
+  const usableHeight = viewportHeight - marginY * 2;
+  const gap = items.length > 0 ? usableHeight / (items.length + 1) : usableHeight;
+  const baseSize = Math.max(90, Math.min(160, Math.round(viewportWidth * 0.1)));
+  const sizeVariants = [0.78, 0.92, 1.08, 0.86, 1.14, 0.82, 0.98];
+  const rotationVariants = [-18, 14, -10, 22, -16, 8, -24, 18, -12, 26, -8, 16, -20];
   const sideInset = Math.max(18, Math.round(viewportWidth * 0.022));
-  const imageSize = Math.max(92, Math.min(150, Math.round(viewportWidth * 0.105)));
 
-  const grouped = items.reduce(
-    (accumulator, item) => {
-      accumulator[item.side].push(item);
-      return accumulator;
-    },
-    { left: [], right: [] },
-  );
+  items.forEach((item, index) => {
+    const isLeftSide = index % 2 === 0;
+    const top = marginY + gap * (index + 1);
+    const size = Math.round(baseSize * sizeVariants[index % sizeVariants.length]);
+    const rotation = rotationVariants[index % rotationVariants.length];
+    const horizontalOffset = sideInset + Math.round(size * 0.12);
 
-  const placeColumn = (columnItems, side) => {
-    const count = columnItems.length;
-    const usableHeight = viewportHeight - marginY * 2;
-    const gap = count > 0 ? usableHeight / (count + 1) : usableHeight;
-    const clippedOffset = Math.max(18, Math.round(imageSize * 0.28));
-
-    columnItems
-      .sort((a, b) => a.row - b.row)
-      .forEach((item, index) => {
-        const centerY = marginY + gap * (index + 1);
-        const alternatingWobble = index % 2 === 0 ? -4 : 4;
-        const horizontalOffset = -(sideInset + (index % 3 === 0 ? clippedOffset : clippedOffset * 0.45));
-
-        item.element.style.width = `${imageSize}px`;
-        item.element.style.height = `${imageSize}px`;
-        item.element.style.top = `${centerY}px`;
-        item.element.style[side] = `${horizontalOffset}px`;
-        item.element.style.transform = `translateY(-50%) rotate(${item.rotate + alternatingWobble}deg) scale(${item.scale})`;
-        item.element.style.zIndex = String(10 + index);
-      });
-  };
-
-  placeColumn(grouped.left, "left");
-  placeColumn(grouped.right, "right");
+    item.element.style.width = `${size}px`;
+    item.element.style.height = `${size}px`;
+    item.element.style.top = `${top}px`;
+    item.element.style[isLeftSide ? "left" : "right"] = `-${horizontalOffset}px`;
+    item.element.style.transform = `translateY(-50%) rotate(${rotation}deg)`;
+    item.element.style.transformOrigin = "50% 50%";
+    item.element.style.zIndex = String(10 + index);
+  });
 }
 
 window.addEventListener("resize", applyDecorativeImageLayout);

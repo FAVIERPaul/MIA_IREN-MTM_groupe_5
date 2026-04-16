@@ -1,12 +1,13 @@
 import { createInputField, createValidationButton, createFeedbackDiv, setFeedback } from "../gameInterface.js";
 
-export function startGame10(container, onFinish) {
+export function startGame31(container, onFinish) {
   const levels = [
+
   {
-    question: "2, 4, 8, 16, ?",
-    answer: "32",
-    hint: "Simple multiplication : chaque terme est multiplié par 2."
-  },
+    question: "10, 9, 8, 7, ?",
+    answer: "5",
+    hint: "La vraie logique ici n'est pas la suite décroit : c'est l'indice (1→10, 2→9 ...)."
+  }
   ];
   container.innerHTML = "";
 
@@ -32,6 +33,11 @@ export function startGame10(container, onFinish) {
 
   function loadLevel() {
     const level = levels[currentLevel];
+    if (!level || typeof level.question !== "string") {
+      setFeedback(feedback, false, "Erreur: niveau mal configure.");
+      return;
+    }
+
     question.textContent = level.question;
     input.value = "";
     attempts = 0;
@@ -57,7 +63,12 @@ export function startGame10(container, onFinish) {
 
   function checkAnswer() {
     const userInput = input.value.trim().toLowerCase();
-    const expected = levels[currentLevel].answer.trim().toLowerCase();
+    const current = levels[currentLevel];
+    if (!current || typeof current.answer !== "string") {
+      setFeedback(feedback, false, "Erreur: reponse du niveau introuvable.");
+      return;
+    }
+    const expected = current.answer.trim().toLowerCase();
 
     attempts++;
 

@@ -3,10 +3,10 @@ import { createInputField, createValidationButton, createFeedbackDiv, setFeedbac
 export function startGame10(container, onFinish) {
   const levels = [
   {
-    question: "2, 4, 8, 16, ?",
-    answer: "32",
-    hint: "Simple multiplication : chaque terme est multiplié par 2."
-  },
+    question: "Dernier niveau : il n'y a pas de logique !"
+    ,answer: "il n'y a pas de logique",
+    hint: "Fais confiance à ton intuition finale."
+  }
   ];
   container.innerHTML = "";
 

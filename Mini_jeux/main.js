@@ -1,4 +1,5 @@
 import { getAllLevels } from "./level.js";
+import { gameManager } from "./gameCleanup.js";
 
 const levels = getAllLevels();
 let currentLevel = 0;
@@ -11,7 +12,6 @@ const nextBtn = document.getElementById("nextBtn");
 const levelTitle = document.getElementById("levelTitle");
 const container = document.getElementById("gameContainer");
 
-// Single source of truth for decorative image placement around the viewport.
 const DECORATIVE_IMAGE_LAYOUT = [
   { selector: ".side-canard", side: "left", row: -2, scale: 0.96, rotate: -12 },
   { selector: ".side-planete", side: "right", row: 0, scale: 0.92, rotate: -10 },
@@ -19,7 +19,7 @@ const DECORATIVE_IMAGE_LAYOUT = [
   { selector: ".side-pizza", side: "right", row: 1, scale: 0.95, rotate: -16 },
   { selector: ".side-manette2", side: "left", row: 2, scale: 0.84, rotate: -10 },
   { selector: ".side-bloc", side: "right", row: 2, scale: 0.92, rotate: -8 },
-   { selector: ".side-bloc2", side: "left", row: 2, scale: 0.92, rotate: -8 },
+  { selector: ".side-bloc2", side: "left", row: 2, scale: 0.92, rotate: -8 },
   { selector: ".side-manette", side: "right", row: 3, scale: 0.92, rotate: 10 },
   { selector: ".side-martien", side: "right", row: 3, scale: 0.9, rotate: 8 },
   { selector: ".side-pacman-echo", side: "left", row: 4, scale: 0.72, rotate: -14 },
@@ -92,6 +92,9 @@ function updateNavButtons() {
 async function loadLevel() {
   const currentLevelData = levels[currentLevel];
 
+  // ARRÊTER COMPLÈTEMENT le jeu précédent
+  gameManager.cleanup();
+
   if (!currentLevelData) {
     levelTitle.textContent = "Bravo !";
     container.innerHTML = "<h3>Tous les jeux sont terminés</h3>";
@@ -104,6 +107,9 @@ async function loadLevel() {
   container.innerHTML = "";
 
   try {
+    // Démarrer le système de tracking des timers
+    gameManager.startGame();
+
     const module = await import(getGameFilePath(currentLevelData.game));
     const startGameFunction = resolveStarter(module, currentLevelData.game);
 
@@ -111,7 +117,12 @@ async function loadLevel() {
       throw new Error(`Aucune fonction de demarrage trouvee dans ${currentLevelData.game}.js`);
     }
 
-    startGameFunction(container, nextLevel);
+    const onFinishWrapper = () => {
+      gameManager.cleanup();
+      nextLevel();
+    };
+
+    startGameFunction(container, onFinishWrapper);
     updateNavButtons();
   } catch (error) {
     console.error(error);

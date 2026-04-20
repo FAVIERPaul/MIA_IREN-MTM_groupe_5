@@ -1,4 +1,4 @@
-export function startGame13(container, onFinish) {
+import { gameManager } from "../gameCleanup.js";export function startGame13(container, onFinish) {
   if (!container) return;
 
   container.innerHTML = "";
@@ -65,8 +65,8 @@ export function startGame13(container, onFinish) {
   const down = (e) => (keys[e.key] = true);
   const up = (e) => (keys[e.key] = false);
 
-  document.addEventListener("keydown", down);
-  document.addEventListener("keyup", up);
+  gameManager.addEventListener(document, "keydown", down);
+  gameManager.addEventListener(document, "keyup", up);
 
   // 🔥 COLLISION PROPRE
   function collideRect(r) {
@@ -233,7 +233,7 @@ export function startGame13(container, onFinish) {
   let running = true;
 
   function loop() {
-    if (!running) return;
+    
     update();
     draw();
     requestAnimationFrame(loop);
@@ -241,8 +241,8 @@ export function startGame13(container, onFinish) {
 
   function endGame(msg) {
     running = false;
-    document.removeEventListener("keydown", down);
-    document.removeEventListener("keyup", up);
+    // removed gameManager.removeEventListener("keydown", down);
+    // removed gameManager.removeEventListener("keyup", up);
     alert(msg);
     onFinish && onFinish();
   }

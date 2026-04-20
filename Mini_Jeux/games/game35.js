@@ -14,7 +14,7 @@ export function startGame35(container, onFinish) {
   hud.innerHTML = "Trouve la sortie… mais tout n’est pas logique.";
   container.appendChild(hud);
 
-  // ✅ VARIABLES AVANT UTILISATION
+  // VARIABLES AVANT UTILISATION
   const cols = 25;
   const rows = 15;
   const cellSize = 36;

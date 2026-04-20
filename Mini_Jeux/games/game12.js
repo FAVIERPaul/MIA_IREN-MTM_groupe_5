@@ -1,3 +1,5 @@
+import { gameManager } from "../gameCleanup.js";
+
 export function startGame12(container, onFinish) {
   if (!container) return;
 
@@ -25,7 +27,7 @@ export function startGame12(container, onFinish) {
   let shrinkZones = [];
 
   const foodColors = ["#60a5fa", "#34d399", "#fbbf24", "#f87171"];
-  const zoneColor = "rgba(59, 130, 246, 0.15)"; // bleu soft
+  const zoneColor = "rgba(59, 130, 246, 0.15)";
 
   let smallTime = 0;
   const requiredSmallTime = 20;
@@ -40,17 +42,18 @@ export function startGame12(container, onFinish) {
     keys[e.key] = false;
   }
 
-  document.addEventListener("keydown", handleKeyDown);
-  document.addEventListener("keyup", handleKeyUp);
+  gameManager.addEventListener(document, "keydown", handleKeyDown);
+  gameManager.addEventListener(document, "keyup", handleKeyUp);
 
   function preventScroll(e) {
     if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
       e.preventDefault();
     }
   }
-  window.addEventListener("keydown", preventScroll);
+  gameManager.addEventListener(window, "keydown", preventScroll);
 
   function spawnFood() {
+    
     foods.push({
       x: Math.random() * 600,
       y: Math.random() * 600,
@@ -60,6 +63,7 @@ export function startGame12(container, onFinish) {
   }
 
   function spawnZone() {
+    
     shrinkZones.push({
       x: Math.random() * 600,
       y: Math.random() * 600,
@@ -67,12 +71,14 @@ export function startGame12(container, onFinish) {
     });
   }
 
-  const foodInterval = setInterval(spawnFood, 900);
-  const zoneInterval = setInterval(spawnZone, 2500);
+  const foodInterval = gameManager.addInterval(setInterval(spawnFood, 900));
+  const zoneInterval = gameManager.addInterval(setInterval(spawnZone, 2500));
 
-  let running = true; // Initialisation de la variable running
+  let running = true;
 
   function update() {
+    
+    
     if (keys["ArrowUp"]) player.y -= player.speed;
     if (keys["ArrowDown"]) player.y += player.speed;
     if (keys["ArrowLeft"]) player.x -= player.speed;
@@ -122,73 +128,58 @@ export function startGame12(container, onFinish) {
 
   function draw() {
     ctx.clearRect(0, 0, 600, 600);
-
-    // fond clean
     ctx.fillStyle = "#0f172a";
     ctx.fillRect(0, 0, 600, 600);
 
-    // nourriture (glow léger)
     foods.forEach((f) => {
       ctx.beginPath();
       ctx.arc(f.x, f.y, f.size, 0, Math.PI * 2);
-
       ctx.fillStyle = f.color;
       ctx.shadowColor = f.color;
       ctx.shadowBlur = 10;
-
       ctx.fill();
-
       ctx.shadowBlur = 0;
     });
 
-    // zones (soft + propre)
     shrinkZones.forEach((z) => {
       ctx.beginPath();
       ctx.arc(z.x, z.y, z.radius, 0, Math.PI * 2);
-
       ctx.fillStyle = zoneColor;
       ctx.fill();
     });
 
-    // joueur (très clean)
     ctx.beginPath();
     ctx.arc(player.x, player.y, player.size, 0, Math.PI * 2);
-
     ctx.fillStyle = player.size <= 10 ? "#22c55e" : "#ffffff";
     ctx.shadowColor = player.size <= 10 ? "#22c55e" : "#ffffff";
     ctx.shadowBlur = 15;
-
     ctx.fill();
-
     ctx.shadowBlur = 0;
 
-    // UI simplifiée
     ctx.font = "16px Arial";
     ctx.fillStyle = "#e5e7eb";
     ctx.fillText(`Taille: ${player.size.toFixed(1)}`, 10, 25);
   }
 
+  let animFrameId = null;
   function gameLoop() {
-    if (!running) return;
+    
     update();
     draw();
-    requestAnimationFrame(gameLoop);
+    animFrameId = requestAnimationFrame(gameLoop);
+    gameManager.addAnimationFrame(animFrameId);
   }
 
   function endGame(message) {
     running = false;
 
-    clearInterval(foodInterval);
-    clearInterval(zoneInterval);
-
-    document.removeEventListener("keydown", handleKeyDown);
-    document.removeEventListener("keyup", handleKeyUp);
-    window.removeEventListener("keydown", preventScroll);
-
-    setTimeout(() => {
-      alert(message);
-      onFinish();
-    }, 100);
+    const timeout = gameManager.addTimeout(setTimeout(() => {
+      if (gameManager.isRunning) {
+        gameManager.cleanup();
+        alert(message);
+        onFinish();
+      }
+    }, 100));
   }
 
   gameLoop(); 

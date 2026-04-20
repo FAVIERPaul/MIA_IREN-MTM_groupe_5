@@ -1,4 +1,5 @@
 import { createGameTitle, createFeedbackDiv, setFeedback, errorMessages } from "../gameInterface.js";
+import { gameManager } from "../gameCleanup.js";
 
 export function startGame1(container, onFinish) {
   container.innerHTML = "";
@@ -38,10 +39,20 @@ export function startGame1(container, onFinish) {
   let player = { ...level.playerStart };
   let keys = {};
 
-  document.onkeydown = (e) => keys[e.key.toLowerCase()] = true;
-  document.onkeyup = (e) => keys[e.key.toLowerCase()] = false;
+  function handleKeyDown(e) {
+    keys[e.key.toLowerCase()] = true;
+  }
+
+  function handleKeyUp(e) {
+    keys[e.key.toLowerCase()] = false;
+  }
+
+  gameManager.addEventListener(document, "keydown", handleKeyDown);
+  gameManager.addEventListener(document, "keyup", handleKeyUp);
 
   function move(dx, dy) {
+    
+    
     let newX = player.x + dx;
     let newY = player.y + dy;
 
@@ -56,6 +67,8 @@ export function startGame1(container, onFinish) {
   }
 
   function update() {
+    
+    
     const c = level.controls;
 
     if (keys[c.up]) move(0, -1);
@@ -90,14 +103,18 @@ export function startGame1(container, onFinish) {
   }
 
   function onWin() {
+    gameManager.cleanup();
     showFeedback(true, "✓ Bien joué !");
-    setTimeout(onFinish, 500);
+    const timeout = gameManager.addTimeout(setTimeout(onFinish, 500));
   }
 
+  let frameId = null;
   function loop() {
+    
     update();
     draw();
-    requestAnimationFrame(loop);
+    frameId = requestAnimationFrame(loop);
+    gameManager.addAnimationFrame(frameId);
   }
 
   loop();

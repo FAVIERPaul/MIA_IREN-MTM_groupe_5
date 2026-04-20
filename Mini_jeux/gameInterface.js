@@ -65,6 +65,78 @@ export function setFeedback(feedbackDiv, isSuccess, message) {
   feedbackDiv.textContent = message;
 }
 
+// Système global robuste de cleanup pour arrêter complètement les jeux
+export const GameCleanup = {
+  intervals: [],
+  timeouts: [],
+  eventListeners: [],
+  animationFrames: [],
+  originalHandlers: {},
+  gameRunning: false,
+
+  addInterval(interval) {
+    this.intervals.push(interval);
+    return interval;
+  },
+
+  addTimeout(timeout) {
+    this.timeouts.push(timeout);
+    return timeout;
+  },
+
+  addAnimationFrame(frameId) {
+    this.animationFrames.push(frameId);
+    return frameId;
+  },
+
+  addEventListener(element, event, handler) {
+    if (!element) return;
+    this.eventListeners.push({ element, event, handler });
+    element.addEventListener(event, handler);
+  },
+
+  cleanup() {
+    // Arrêter tous les animation frames
+    this.animationFrames.forEach(frameId => cancelAnimationFrame(frameId));
+    this.animationFrames = [];
+
+    // Arrêter tous les intervals
+    this.intervals.forEach(interval => {
+      if (interval !== null && interval !== undefined) {
+        clearInterval(interval);
+      }
+    });
+    this.intervals = [];
+
+    // Arrêter tous les timeouts
+    this.timeouts.forEach(timeout => {
+      if (timeout !== null && timeout !== undefined) {
+        clearTimeout(timeout);
+      }
+    });
+    this.timeouts = [];
+
+    // Supprimer tous les event listeners
+    this.eventListeners.forEach(({ element, event, handler }) => {
+      if (element && handler) {
+        element.removeEventListener(event, handler);
+      }
+    });
+    this.eventListeners = [];
+
+    // Marquer le jeu comme arrêté
+    this.gameRunning = false;
+  },
+
+  reset() {
+    this.cleanup();
+  },
+
+  startGame() {
+    this.gameRunning = true;
+  }
+};
+
 export function createMemoryGame(container, onFinish, pairs, pairsToNotDuplicate = []) {
   container.innerHTML = "";
 
@@ -149,7 +221,8 @@ export function createMemoryGame(container, onFinish, pairs, pairsToNotDuplicate
     cardInner.appendChild(cardBack);
     card.appendChild(cardInner);
 
-    card.addEventListener("click", () => {
+    const clickHandler = () => {
+      if (!GameCleanup.gameRunning) return;
       if (cardData.flipped || cardData.matched || secondCard) return;
 
       cardData.flipped = true;
@@ -185,6 +258,7 @@ export function createMemoryGame(container, onFinish, pairs, pairsToNotDuplicate
           secondCard = null;
 
           if (matchedPairs === totalPairsToMatch) {
+            GameCleanup.cleanup();
             setTimeout(() => {
               alert("Bravo, vous avez gagné !");
               onFinish();
@@ -192,19 +266,24 @@ export function createMemoryGame(container, onFinish, pairs, pairsToNotDuplicate
           }
 
         } else {
-          setTimeout(() => {
-            firstCard.cardData.flipped = false;
-            secondCard.cardData.flipped = false;
+          const timeout = setTimeout(() => {
+            if (GameCleanup.gameRunning) {
+              firstCard.cardData.flipped = false;
+              secondCard.cardData.flipped = false;
 
-            firstCard.card.firstChild.style.transform = "rotateY(0deg)";
-            secondCard.card.firstChild.style.transform = "rotateY(0deg)";
+              firstCard.card.firstChild.style.transform = "rotateY(0deg)";
+              secondCard.card.firstChild.style.transform = "rotateY(0deg)";
 
-            firstCard = null;
-            secondCard = null;
+              firstCard = null;
+              secondCard = null;
+            }
           }, 700);
+          GameCleanup.addTimeout(timeout);
         }
       }
-    });
+    };
+
+    GameCleanup.addEventListener(card, "click", clickHandler);
 
     return card;
   }

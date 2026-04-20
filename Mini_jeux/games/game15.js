@@ -1,4 +1,4 @@
-let gameState = {};
+import { gameManager } from "../gameCleanup.js";let gameState = {};
 
 export function startGame15(container, onFinish) {
     // 1. Agrandissement de la Grille (8x8) pour l'UX

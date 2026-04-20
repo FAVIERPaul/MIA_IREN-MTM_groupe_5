@@ -1,4 +1,4 @@
-export function startGame14(container, onFinish) {
+import { gameManager } from "../gameCleanup.js";export function startGame14(container, onFinish) {
   container.innerHTML = "";
 
   const title = document.createElement("h2");
@@ -293,7 +293,7 @@ export function startGame14(container, onFinish) {
     }
   }
 
-  window.addEventListener("keydown", handleKey);
+  gameManager.addEventListener(window, "keydown", handleKey);
 
   reset();
   requestAnimationFrame(loop);

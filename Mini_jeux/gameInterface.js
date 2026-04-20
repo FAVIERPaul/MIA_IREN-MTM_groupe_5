@@ -65,7 +65,7 @@ export function setFeedback(feedbackDiv, isSuccess, message) {
   feedbackDiv.textContent = message;
 }
 
-export function createMemoryGame(container, onFinish, pairs) {
+export function createMemoryGame(container, onFinish, pairs, pairsToNotDuplicate = []) {
   container.innerHTML = "";
 
   const title = document.createElement("h2");
@@ -83,7 +83,13 @@ export function createMemoryGame(container, onFinish, pairs) {
   cardContainer.style.maxWidth = "600px";
   container.appendChild(cardContainer);
 
-  const cards = [...pairs, ...pairs.map(({ id, pair }) => ({ id: pair, pair: id }))]
+  // Dupliquer les paires normales mais pas les intrus
+  const duplicatedPairs = pairs.map(({ id, pair }) => ({ id: pair, pair: id }));
+  const cards = [
+    ...pairs,
+    ...duplicatedPairs,
+    ...pairsToNotDuplicate
+  ]
     .sort(() => Math.random() - 0.5)
     .map(({ id, pair }) => ({
       id,
@@ -95,6 +101,7 @@ export function createMemoryGame(container, onFinish, pairs) {
   let firstCard = null;
   let secondCard = null;
   let matchedPairs = 0;
+  const totalPairsToMatch = pairs.length;
 
   function createCard(cardData) {
     const card = document.createElement("div");
@@ -177,7 +184,7 @@ export function createMemoryGame(container, onFinish, pairs) {
           firstCard = null;
           secondCard = null;
 
-          if (matchedPairs === pairs.length) {
+          if (matchedPairs === totalPairsToMatch) {
             setTimeout(() => {
               alert("Bravo, vous avez gagné !");
               onFinish();
@@ -207,55 +214,3 @@ export function createMemoryGame(container, onFinish, pairs) {
     cardContainer.appendChild(card);
   });
 }
-
-function decorativeLayout() {
-  
-  const images = [...document.querySelectorAll(".side-image")];
-
-  // Mélange aléatoire pour éviter que les mêmes images soient du même côté
-  const shuffled = images.sort(() => Math.random() - 0.5);
-
-  // Répartition équitable
-  const half = Math.ceil(shuffled.length / 2);
-  const leftImages = shuffled.slice(0, half);
-  const rightImages = shuffled.slice(half);
-
-  placeColumn(leftImages, "left");
-  placeColumn(rightImages, "right");
-}
-
-function placeColumn(imgList, side) {
-  const screenH = window.innerHeight;
-  const segments = imgList.length;
-  const segmentHeight = screenH / segments;
-
-  imgList.forEach((img, index) => {
-    // Taille contrôlée
-    const size = Math.floor(Math.random() * 60) + 120; // 120–180px
-    img.style.width = size + "px";
-    img.style.height = size + "px";
-
-    // Rotation contrôlée
-    const rotation = Math.random() * 30 - 15; // -15° à +15°
-    img.style.transform = `rotate(${rotation}deg)`;
-
-    // Position verticale dans son segment
-    const maxOffset = segmentHeight - size - 20;
-    const offset = Math.max(0, Math.random() * maxOffset);
-
-    const top = index * segmentHeight + offset;
-    img.style.top = `${top}px`;
-
-    // Position horizontale
-    if (side === "left") {
-      img.style.left = "0px";
-      img.style.right = "auto";
-    } else {
-      img.style.right = "0px";
-      img.style.left = "auto";
-    }
-  });
-}
-
-window.addEventListener("load", decorativeLayout);
-window.addEventListener("resize", decorativeLayout);

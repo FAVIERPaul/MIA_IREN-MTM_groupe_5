@@ -706,3 +706,12 @@ body.in-game .start-btn {
     font-size: 1.3rem;
   }
 }
+
+.side-image {
+  position: absolute;
+  pointer-events: none;
+  filter: drop-shadow(0 0 12px rgba(46, 232, 255, 0.4));
+  opacity: 0.75;
+  background-size: contain;
+  background-repeat: no-repeat;
+}

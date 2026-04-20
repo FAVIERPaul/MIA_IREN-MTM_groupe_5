@@ -16,7 +16,6 @@ export function startGame9(container, onFinish) {
     { id: "anise" },
     { id: "flower purple" }
   ];
-
   const cards = [
     ...pairs.map((pair) => ({ ...pair, flipped: false, matched: false })),
     ...intruders.map((intruder) => ({ ...intruder, flipped: false, matched: false }))

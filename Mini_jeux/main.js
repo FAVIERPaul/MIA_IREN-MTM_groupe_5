@@ -153,3 +153,4 @@ prevBtn.addEventListener("click", previousLevel);
 applyDecorativeImageLayout();
 
 window.startGame = startGameFlow;
+

@@ -207,3 +207,55 @@ export function createMemoryGame(container, onFinish, pairs) {
     cardContainer.appendChild(card);
   });
 }
+
+function decorativeLayout() {
+  
+  const images = [...document.querySelectorAll(".side-image")];
+
+  // Mélange aléatoire pour éviter que les mêmes images soient du même côté
+  const shuffled = images.sort(() => Math.random() - 0.5);
+
+  // Répartition équitable
+  const half = Math.ceil(shuffled.length / 2);
+  const leftImages = shuffled.slice(0, half);
+  const rightImages = shuffled.slice(half);
+
+  placeColumn(leftImages, "left");
+  placeColumn(rightImages, "right");
+}
+
+function placeColumn(imgList, side) {
+  const screenH = window.innerHeight;
+  const segments = imgList.length;
+  const segmentHeight = screenH / segments;
+
+  imgList.forEach((img, index) => {
+    // Taille contrôlée
+    const size = Math.floor(Math.random() * 60) + 120; // 120–180px
+    img.style.width = size + "px";
+    img.style.height = size + "px";
+
+    // Rotation contrôlée
+    const rotation = Math.random() * 30 - 15; // -15° à +15°
+    img.style.transform = `rotate(${rotation}deg)`;
+
+    // Position verticale dans son segment
+    const maxOffset = segmentHeight - size - 20;
+    const offset = Math.max(0, Math.random() * maxOffset);
+
+    const top = index * segmentHeight + offset;
+    img.style.top = `${top}px`;
+
+    // Position horizontale
+    if (side === "left") {
+      img.style.left = "0px";
+      img.style.right = "auto";
+    } else {
+      img.style.right = "0px";
+      img.style.left = "auto";
+    }
+  });
+}
+
+window.addEventListener("load", decorativeLayout);
+window.addEventListener("resize", decorativeLayout);

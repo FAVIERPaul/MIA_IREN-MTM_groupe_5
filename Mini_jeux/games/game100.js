@@ -12,7 +12,7 @@ export function startGame100(container, onFinish) {
     const canvas = container.querySelector("#cubeCanvas");
     const ctx = canvas.getContext("2d");
 
-    game17 = {
+    game100 = {
         ctx,
         canvas,
         size: 4,
@@ -39,7 +39,7 @@ function initCube() {
 
     for (let row = 0; row < 4; row++) {
         for (let col = 0; col < 4; col++) {
-            game17.grid[row * 4 + col] = colors[row];
+            game100.grid[row * 4 + col] = colors[row];
         }
     }
 }
@@ -62,30 +62,30 @@ function mixCube() {
 /* ---------- DRAG ---------- */
 
 function startDrag(e) {
-    const rect = game17.canvas.getBoundingClientRect();
+    const rect = game100.canvas.getBoundingClientRect();
     const mx = e.clientX - rect.left;
     const my = e.clientY - rect.top;
 
-    const x = Math.floor(mx / game17.tileSize);
-    const y = Math.floor(my / game17.tileSize);
+    const x = Math.floor(mx / game100.tileSize);
+    const y = Math.floor(my / game100.tileSize);
 
-    game17.dragging = true;
-    game17.dragStart = { x, y, mx, my };
+    game100.dragging = true;
+    game100.dragStart = { x, y, mx, my };
 }
 
 function endDrag(e) {
-    if (!game17.dragging) return;
-    game17.dragging = false;
+    if (!game100.dragging) return;
+    game100.dragging = false;
 
-    const rect = game17.canvas.getBoundingClientRect();
+    const rect = game100.canvas.getBoundingClientRect();
     const mx = e.clientX - rect.left;
     const my = e.clientY - rect.top;
 
-    const dx = mx - game17.dragStart.mx;
-    const dy = my - game17.dragStart.my;
+    const dx = mx - game100.dragStart.mx;
+    const dy = my - game100.dragStart.my;
 
-    const row = game17.dragStart.y;
-    const col = game17.dragStart.x;
+    const row = game100.dragStart.y;
+    const col = game100.dragStart.x;
 
     // Horizontal → ligne
     if (Math.abs(dx) > Math.abs(dy)) {
@@ -103,16 +103,16 @@ function endDrag(e) {
 
 function slideRow(row, dir, countMove) {
     const start = row * 4;
-    const line = game17.grid.slice(start, start + 4);
+    const line = game100.grid.slice(start, start + 4);
 
     if (dir === 1) line.unshift(line.pop());
     else line.push(line.shift());
 
-    for (let i = 0; i < 4; i++) game17.grid[start + i] = line[i];
+    for (let i = 0; i < 4; i++) game100.grid[start + i] = line[i];
 
     if (countMove) {
-        game17.moves++;
-        document.getElementById("moves17").textContent = game17.moves;
+        game100.moves++;
+        document.getElementById("moves17").textContent = game100.moves;
         checkCubeWin();
     }
 
@@ -123,16 +123,16 @@ function slideRow(row, dir, countMove) {
 
 function slideCol(col, dir, countMove) {
     const colVals = [];
-    for (let i = 0; i < 4; i++) colVals.push(game17.grid[i * 4 + col]);
+    for (let i = 0; i < 4; i++) colVals.push(game100.grid[i * 4 + col]);
 
     if (dir === 1) colVals.unshift(colVals.pop());
     else colVals.push(colVals.shift());
 
-    for (let i = 0; i < 4; i++) game17.grid[i * 4 + col] = colVals[i];
+    for (let i = 0; i < 4; i++) game100.grid[i * 4 + col] = colVals[i];
 
     if (countMove) {
-        game17.moves++;
-        document.getElementById("moves17").textContent = game17.moves;
+        game100.moves++;
+        document.getElementById("moves17").textContent = game100.moves;
         checkCubeWin();
     }
 
@@ -144,28 +144,28 @@ function slideCol(col, dir, countMove) {
 function checkCubeWin() {
     for (let row = 0; row < 4; row++) {
         const start = row * 4;
-        const color = game17.grid[start];
+        const color = game100.grid[start];
 
         for (let i = 0; i < 4; i++) {
-            if (game17.grid[start + i] !== color) return;
+            if (game100.grid[start + i] !== color) return;
         }
     }
 
     document.getElementById("msg17").textContent = "🎉 Bravo ! Toutes les lignes sont monochromes !";
-    setTimeout(game17.onFinish, 1500);
+    setTimeout(game100.onFinish, 1500);
 }
 
 /* ---------- RENDER ---------- */
 
 function renderCube() {
-    const ctx = game17.ctx;
+    const ctx = game100.ctx;
     ctx.fillStyle = "#2c3e50";
     ctx.fillRect(0, 0, 360, 360);
 
     for (let i = 0; i < 16; i++) {
-        const color = game17.grid[i];
-        const x = (i % 4) * game17.tileSize;
-        const y = Math.floor(i / 4) * game17.tileSize;
+        const color = game100.grid[i];
+        const x = (i % 4) * game100.tileSize;
+        const y = Math.floor(i / 4) * game100.tileSize;
 
         ctx.fillStyle = color;
         ctx.fillRect(x + 5, y + 5, 80, 80);

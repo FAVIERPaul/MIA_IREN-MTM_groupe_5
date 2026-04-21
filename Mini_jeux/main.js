@@ -11,6 +11,7 @@ const prevBtn = document.getElementById("prevBtn");
 const nextBtn = document.getElementById("nextBtn");
 const levelTitle = document.getElementById("levelTitle");
 const container = document.getElementById("gameContainer");
+const STAR_RAIN_LAYER_ID = "starRainLayer";
 
 const DECORATIVE_IMAGE_LAYOUT = [
   { selector: ".side-canard", row: 0, col: 1, scale: 1.18, rotate: -12 },
@@ -34,6 +35,68 @@ const DECORATIVE_IMAGE_LAYOUT = [
   { selector: ".side-pacman-echo", row: 6, col: 1, scale: 0.88, rotate: -12 },
   { selector: ".side-manette2", row: 6, col: 4, scale: 1.0, rotate: -12 },
 ];
+
+function getOrCreateStarRainLayer() {
+  let layer = document.getElementById(STAR_RAIN_LAYER_ID);
+  if (layer) return layer;
+
+  layer = document.createElement("div");
+  layer.id = STAR_RAIN_LAYER_ID;
+  layer.className = "star-rain-layer";
+  document.body.appendChild(layer);
+  return layer;
+}
+
+function triggerStarRain(originX, originY) {
+  const layer = getOrCreateStarRainLayer();
+  const viewportWidth = window.innerWidth;
+  const totalStars = 34;
+
+  for (let i = 0; i < totalStars; i += 1) {
+    const star = document.createElement("span");
+    star.className = "star-rain-particle";
+
+    const left = originX + (Math.random() - 0.5) * 360;
+    const clampedLeft = Math.max(12, Math.min(viewportWidth - 12, left));
+    const size = 7 + Math.random() * 10;
+    const duration = 1050 + Math.random() * 1100;
+    const delay = Math.random() * 200;
+    const drift = (Math.random() - 0.5) * 140;
+    const startOffsetY = -80 - Math.random() * (Math.max(originY, 60) * 0.2);
+
+    star.style.left = `${clampedLeft}px`;
+    star.style.top = `${startOffsetY}px`;
+    star.style.setProperty("--star-size", `${size}px`);
+    star.style.setProperty("--star-fall-duration", `${duration}ms`);
+    star.style.setProperty("--star-fall-delay", `${delay}ms`);
+    star.style.setProperty("--star-drift", `${drift}px`);
+
+    star.addEventListener("animationend", () => {
+      star.remove();
+    });
+
+    layer.appendChild(star);
+  }
+}
+
+function setupDecorativeImageClicks() {
+  const images = document.querySelectorAll(".side-image");
+  images.forEach((image) => {
+    image.addEventListener("click", () => {
+      if (homeScreen.classList.contains("hidden")) return;
+
+      const bounds = image.getBoundingClientRect();
+      const centerX = bounds.left + bounds.width / 2;
+      const centerY = bounds.top + bounds.height / 2;
+
+      image.classList.remove("side-image-burst");
+      void image.offsetWidth;
+      image.classList.add("side-image-burst");
+
+      triggerStarRain(centerX, centerY);
+    });
+  });
+}
 
 function applyDecorativeImageLayout() {
   const items = DECORATIVE_IMAGE_LAYOUT
@@ -177,5 +240,6 @@ nextBtn.addEventListener("click", nextLevel);
 prevBtn.addEventListener("click", previousLevel);
 
 applyDecorativeImageLayout();
+setupDecorativeImageClicks();
 
 window.startGame = startGameFlow;

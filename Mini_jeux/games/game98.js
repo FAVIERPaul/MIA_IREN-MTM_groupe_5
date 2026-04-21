@@ -28,7 +28,10 @@ export function startGame98(container, onFinish) {
         drawing: false,
         startPoint: null,
         onFinish,
-        status: "PLAYING"
+        status: "PLAYING",
+
+        // 🔒 FIXE LA PIZZA POUR TOUJOURS
+        fixedSeed: Math.random() * 999999
     };
 
     canvas.addEventListener("mousedown", startDraw);
@@ -72,6 +75,8 @@ function endDraw(e) {
     const { x, y } = getMousePos(e);
 
     const cx = 200, cy = 200;
+
+    // 🔒 ANGLE ABSOLU FIXE — aucune rotation possible
     const angle = Math.atan2(y - cy, x - cx);
     const normalized = (angle + Math.PI * 2) % (Math.PI * 2);
 
@@ -135,7 +140,7 @@ function checkPizzaWin() {
     setTimeout(pizzaGame.onFinish, 1500);
 }
 
-/* ------------------ DRAW PIZZA (diavola réaliste) ------------------ */
+/* ------------------ DRAW PIZZA (réaliste + fixe) ------------------ */
 
 function drawPizza() {
     const ctx = pizzaGame.ctx;
@@ -144,17 +149,20 @@ function drawPizza() {
     const cx = 200;
     const cy = 200;
 
+    // 🔒 FIXE LE RANDOM POUR QUE LA PIZZA NE CHANGE JAMAIS
+    const rand = seededRandom(pizzaGame.fixedSeed);
+
     /* FOND */
     const bgGrad = ctx.createRadialGradient(cx, cy, 50, cx, cy, 220);
-    bgGrad.addColorStop(0, "#222");
+    bgGrad.addColorStop(0, "#333");
     bgGrad.addColorStop(1, "#000");
     ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, 400, 400);
 
     /* CROÛTE */
     const crustGrad = ctx.createRadialGradient(cx, cy, 130, cx, cy, 190);
-    crustGrad.addColorStop(0, "#f3c892");
-    crustGrad.addColorStop(0.5, "#d89b5a");
+    crustGrad.addColorStop(0, "#f4cfa1");
+    crustGrad.addColorStop(0.5, "#d8a56a");
     crustGrad.addColorStop(1, "#8b5a2b");
 
     ctx.fillStyle = crustGrad;
@@ -162,41 +170,70 @@ function drawPizza() {
     ctx.arc(cx, cy, 185, 0, Math.PI * 2);
     ctx.fill();
 
-    // Taches brûlées
-    ctx.fillStyle = "rgba(60,30,10,0.55)";
-    for (let i = 0; i < 14; i++) {
-        const angle = Math.random() * Math.PI * 2;
-        const r = 165 + Math.random() * 15;
+    // Taches brûlées (fixées)
+    ctx.fillStyle = "rgba(50,25,10,0.55)";
+    for (let i = 0; i < 16; i++) {
+        const angle = rand() * Math.PI * 2;
+        const r = 165 + rand() * 15;
         const x = cx + Math.cos(angle) * r;
         const y = cy + Math.sin(angle) * r;
         ctx.beginPath();
-        ctx.ellipse(x, y, 5 + Math.random() * 4, 3 + Math.random() * 2, angle, 0, Math.PI * 2);
+        ctx.ellipse(x, y, 6 + rand() * 4, 3 + rand() * 2, angle, 0, Math.PI * 2);
         ctx.fill();
     }
 
-    /* SAUCE */
-    const sauceGrad = ctx.createRadialGradient(cx, cy, 40, cx, cy, 160);
-    sauceGrad.addColorStop(0, "#b71c1c");
-    sauceGrad.addColorStop(0.5, "#d32f2f");
-    sauceGrad.addColorStop(1, "#7f1010");
+    /* BASE TOMATE + MOZZARELLA FONDUE */
+    const sauceCheeseGrad = ctx.createRadialGradient(cx, cy, 20, cx, cy, 150);
+    sauceCheeseGrad.addColorStop(0, "#fff4e6");
+    sauceCheeseGrad.addColorStop(0.25, "#ffe0c7");
+    sauceCheeseGrad.addColorStop(0.55, "#e84c3d");
+    sauceCheeseGrad.addColorStop(1, "#b71c1c");
 
-    ctx.fillStyle = sauceGrad;
-    ctx.beginPath();
-    ctx.arc(cx, cy, 160, 0, Math.PI * 2);
-    ctx.fill();
-
-    /* FROMAGE */
-    const cheeseGrad = ctx.createRadialGradient(cx, cy, 30, cx, cy, 150);
-    cheeseGrad.addColorStop(0, "#ffe9a3");
-    cheeseGrad.addColorStop(0.5, "#ffd36b");
-    cheeseGrad.addColorStop(1, "#f7b733");
-
-    ctx.fillStyle = cheeseGrad;
+    ctx.fillStyle = sauceCheeseGrad;
     ctx.beginPath();
     ctx.arc(cx, cy, 150, 0, Math.PI * 2);
     ctx.fill();
 
-    /* SALAMI */
+    /* TACHES DE MOZZARELLA ÉTALÉE */
+    ctx.fillStyle = "#fffdf8";
+    for (let i = 0; i < 12; i++) {
+        const angle = rand() * Math.PI * 2;
+        const r = 20 + rand() * 110;
+        const x = cx + Math.cos(angle) * r;
+        const y = cy + Math.sin(angle) * r;
+
+        ctx.beginPath();
+        ctx.ellipse(
+            x,
+            y,
+            12 + rand() * 10,
+            8 + rand() * 6,
+            rand() * Math.PI,
+            0,
+            Math.PI * 2
+        );
+        ctx.fill();
+    }
+
+    /* COPEAUX DE GRUYÈRE RÂPÉ */
+    ctx.strokeStyle = "rgba(255,220,120,0.9)";
+    ctx.lineWidth = 2;
+    for (let i = 0; i < 45; i++) {
+        const angle = rand() * Math.PI * 2;
+        const r = 25 + rand() * 110;
+        const x = cx + Math.cos(angle) * r;
+        const y = cy + Math.sin(angle) * r;
+
+        const dx = (rand() - 0.5) * 14;
+        const dy = (rand() - 0.5) * 14;
+
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + dx, y + dy);
+        ctx.stroke();
+    }
+
+    /* SALAMI DIAVOLA (fixe) */
     const salamiPositions = [
         { x: cx - 60, y: cy - 40 },
         { x: cx + 55, y: cy - 30 },
@@ -209,19 +246,18 @@ function drawPizza() {
     for (const p of salamiPositions) {
         const salGrad = ctx.createRadialGradient(p.x, p.y, 5, p.x, p.y, 22);
         salGrad.addColorStop(0, "#ff6b6b");
-        salGrad.addColorStop(0.4, "#e53935");
-        salGrad.addColorStop(1, "#8e1b1b");
+        salGrad.addColorStop(0.4, "#d63a3a");
+        salGrad.addColorStop(1, "#7a1a1a");
 
         ctx.fillStyle = salGrad;
         ctx.beginPath();
         ctx.arc(p.x, p.y, 20, 0, Math.PI * 2);
         ctx.fill();
 
-        // petits points de gras
         ctx.fillStyle = "rgba(255,230,180,0.8)";
         for (let i = 0; i < 5; i++) {
-            const a = Math.random() * Math.PI * 2;
-            const r = 4 + Math.random() * 8;
+            const a = rand() * Math.PI * 2;
+            const r = 4 + rand() * 8;
             const sx = p.x + Math.cos(a) * r;
             const sy = p.y + Math.sin(a) * r;
             ctx.beginPath();
@@ -260,7 +296,7 @@ function drawPizza() {
     ];
     for (const b of basil) {
         ctx.beginPath();
-        ctx.ellipse(b.x, b.y, 14, 7, Math.random(), 0, Math.PI * 2);
+        ctx.ellipse(b.x, b.y, 14, 7, rand() * Math.PI, 0, Math.PI * 2);
         ctx.fill();
     }
 
@@ -268,8 +304,8 @@ function drawPizza() {
     ctx.strokeStyle = "rgba(255, 215, 130, 0.4)";
     ctx.lineWidth = 2;
     for (let i = 0; i < 8; i++) {
-        const angle = Math.random() * Math.PI * 2;
-        const r = 30 + Math.random() * 100;
+        const angle = rand() * Math.PI * 2;
+        const r = 30 + rand() * 100;
         const x = cx + Math.cos(angle) * r;
         const y = cy + Math.sin(angle) * r;
 
@@ -291,4 +327,13 @@ function drawPizza() {
         ctx.lineTo(x, y);
         ctx.stroke();
     }
+}
+
+/* ------------------ RANDOM FIXE ------------------ */
+
+function seededRandom(seed) {
+    return function () {
+        seed = (seed * 9301 + 49297) % 233280;
+        return seed / 233280;
+    };
 }

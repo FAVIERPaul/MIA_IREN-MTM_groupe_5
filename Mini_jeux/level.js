@@ -1,7 +1,7 @@
 // Level management module
 
 const levels = [
-  { game: 'game37', difficulty: 'easy' },
+  { game: 'game1', difficulty: 'easy' },
   { game: 'game2', difficulty: 'easy' },
   { game: 'game3', difficulty: 'easy' },
   { game: 'game4', difficulty: 'medium' },
@@ -29,17 +29,15 @@ const levels = [
   { game: 'game26', difficulty: 'hard' },
   { game: 'game27', difficulty: 'hard' },
   { game: 'game28', difficulty: 'hard' },
+  { game: 'game29', difficulty: 'hard' },
   { game: 'game30', difficulty: 'hard' },
   { game: 'game31', difficulty: 'hard' },
   { game: 'game32', difficulty: 'hard' },
   { game: 'game33', difficulty: 'hard' },
   { game: 'game34', difficulty: 'hard' },
   { game: 'game35', difficulty: 'hard' },
-<<<<<<< Updated upstream
-=======
   { game: 'game36', difficulty: 'hard' },
   { game: 'game37', difficulty: 'hard' },
->>>>>>> Stashed changes
 ];
 
 // Get the next level
@@ -51,6 +49,3 @@ export function getNextLevel(currentLevelIndex) {
 export function getAllLevels() {
   return levels;
 }
-
-// Example usage
-// console.log(getNextLevel(0)); // { game: 'game2', difficulty: 'medium' }

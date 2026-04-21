@@ -342,7 +342,7 @@ button:active {
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
-  opacity: 0.7;
+  opacity: 0.9;
   filter: drop-shadow(0 0 12px rgba(46, 232, 255, 0.4));
 }
 
@@ -360,7 +360,7 @@ button:active {
   background-image: url("./assets/images/fond_manette.png");
   background-blend-mode: multiply;
   width: clamp(98px, 12vw, 165px);
-  opacity: 0.54;
+  opacity: 0.78;
   border-radius: 14px;
 }
 
@@ -375,31 +375,31 @@ button:active {
 .side-martien {
   background-image: url("./assets/images/fond_martien.png");
   width: clamp(108px, 12vw, 188px);
-  opacity: 0.56;
+  opacity: 0.8;
 }
 
 .side-planete {
   background-image: url("./assets/images/Fonds_planete.png");
   width: clamp(112px, 13vw, 188px);
-  opacity: 0.46;
+  opacity: 0.74;
 }
 
 .side-fusee {
   background-image: url("./assets/images/fond_fus%C3%A9e.png");
   width: clamp(86px, 10vw, 142px);
-  opacity: 0.56;
+  opacity: 0.82;
 }
 
 .side-pizza {
   background-image: url("./assets/images/fond_pizza.png");
   width: clamp(104px, 12vw, 172px);
-  opacity: 0.6;
+  opacity: 0.84;
 }
 
 .side-pizza-echo {
   background-image: url("./assets/images/fond_pizza.png");
   width: clamp(82px, 8vw, 120px);
-  opacity: 0.34;
+  opacity: 0.68;
 }
 
 .side-pacman {
@@ -409,13 +409,19 @@ button:active {
 .side-pacman-echo {
   background-image: url("./assets/images/fond_pacman.png");
   width: clamp(78px, 8vw, 116px);
-  opacity: 0.3;
+  opacity: 0.66;
 }
 
 .side-planete-echo {
   background-image: url("./assets/images/Fonds_planete.png");
   width: clamp(90px, 10vw, 138px);
-  opacity: 0.28;
+  opacity: 0.64;
+}
+
+.side-fusee-echo {
+  background-image: url("./assets/images/fond_fus%C3%A9e.png");
+  width: clamp(76px, 8vw, 116px);
+  opacity: 0.68;
 }
 
 .t-shape {

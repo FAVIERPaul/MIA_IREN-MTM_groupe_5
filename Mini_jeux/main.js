@@ -13,19 +13,26 @@ const levelTitle = document.getElementById("levelTitle");
 const container = document.getElementById("gameContainer");
 
 const DECORATIVE_IMAGE_LAYOUT = [
-  { selector: ".side-canard", side: "left", row: -2, scale: 0.96, rotate: -12 },
-  { selector: ".side-planete", side: "right", row: 0, scale: 0.92, rotate: -10 },
-  { selector: ".side-fantome", side: "left", row: 1, scale: 0.9, rotate: 8 },
-  { selector: ".side-pizza", side: "right", row: 1, scale: 0.95, rotate: -16 },
-  { selector: ".side-manette2", side: "left", row: 2, scale: 0.84, rotate: -10 },
-  { selector: ".side-bloc", side: "right", row: 2, scale: 0.92, rotate: -8 },
-  { selector: ".side-manette", side: "right", row: 3, scale: 0.92, rotate: 10 },
-  { selector: ".side-martien", side: "right", row: 3, scale: 0.9, rotate: 8 },
-  { selector: ".side-pacman-echo", side: "left", row: 4, scale: 0.72, rotate: -14 },
-  { selector: ".side-fusee", side: "right", row: 4, scale: 0.86, rotate: 22 },
-  { selector: ".side-pizza-echo", side: "left", row: 5, scale: 0.66, rotate: 11 },
-  { selector: ".side-planete-echo", side: "left", row: 5, scale: 0.68, rotate: 9 },
-  { selector: ".side-pacman", side: "right", row: 6, scale: 0.88, rotate: 14 },
+  { selector: ".side-canard", row: 0, col: 1, scale: 1.18, rotate: -12 },
+  { selector: ".side-planete", row: 0, col: 4, scale: 1.08, rotate: 10 },
+
+  { selector: ".side-manette", row: 1, col: 2, scale: 1.04, rotate: -10 },
+  { selector: ".side-bloc", row: 1, col: 3, scale: 1.2, rotate: 8 },
+
+  { selector: ".side-fantome", row: 2, col: 1, scale: 1.18, rotate: 12 },
+  { selector: ".side-pizza", row: 2, col: 4, scale: 1.08, rotate: -14 },
+
+  { selector: ".side-planete-echo", row: 3, col: 2, scale: 0.96, rotate: -10 },
+  { selector: ".side-pacman", row: 3, col: 3, scale: 1.02, rotate: 14 },
+
+  { selector: ".side-fusee-echo", row: 4, col: 1, scale: 0.98, rotate: 12 },
+  { selector: ".side-fusee", row: 4, col: 4, scale: 1.16, rotate: 20 },
+
+  { selector: ".side-pizza-echo", row: 5, col: 2, scale: 0.86, rotate: 9 },
+  { selector: ".side-martien", row: 5, col: 3, scale: 1.08, rotate: -8 },
+
+  { selector: ".side-pacman-echo", row: 6, col: 1, scale: 0.88, rotate: -12 },
+  { selector: ".side-manette2", row: 6, col: 4, scale: 1.0, rotate: -12 },
 ];
 
 function applyDecorativeImageLayout() {
@@ -37,28 +44,35 @@ function applyDecorativeImageLayout() {
 
   const viewportHeight = window.innerHeight;
   const viewportWidth = window.innerWidth;
-  const marginY = Math.max(42, Math.round(viewportHeight * 0.075));
-  const usableHeight = viewportHeight - marginY * 2;
-  const gap = items.length > 0 ? usableHeight / (items.length + 1) : usableHeight;
-  const baseSize = Math.max(90, Math.min(160, Math.round(viewportWidth * 0.1)));
-  const sizeVariants = [0.78, 0.92, 1.08, 0.86, 1.14, 0.82, 0.98];
-  const rotationVariants = [-18, 14, -10, 22, -16, 8, -24, 18, -12, 26, -8, 16, -20];
-  const sideInset = Math.max(18, Math.round(viewportWidth * 0.022));
+  const rows = 7;
+  const marginY = Math.max(42, Math.round(viewportHeight * 0.08));
+  const usableHeight = Math.max(220, viewportHeight - marginY * 2);
+  const rowGap = usableHeight / (rows - 1);
+  const baseSize = Math.max(96, Math.min(182, Math.round(viewportWidth * 0.11)));
+  const edgeInset = Math.max(16, Math.round(viewportWidth * 0.02));
+  const innerOffset = Math.max(84, Math.round(viewportWidth * 0.12));
+  const edgeNudge = Math.max(8, Math.round(viewportWidth * 0.01));
+
+  const columnX = {
+    1: edgeInset + edgeNudge,
+    2: edgeInset + innerOffset,
+    3: viewportWidth - (edgeInset + innerOffset),
+    4: viewportWidth - (edgeInset + edgeNudge),
+  };
 
   items.forEach((item, index) => {
-    const isLeftSide = item.side === "left";
-    const top = marginY + gap * (index + 1);
-    const size = Math.round(baseSize * sizeVariants[index % sizeVariants.length]);
-    const rotation = rotationVariants[index % rotationVariants.length];
-    const horizontalOffset = sideInset;
+    const safeRow = Math.max(0, Math.min(rows - 1, item.row));
+    const safeCol = columnX[item.col] ? item.col : 1;
+    const top = marginY + safeRow * rowGap;
+    const size = Math.round(baseSize * (item.scale || 1));
+    const rotation = item.rotate || 0;
 
     item.element.style.width = `${size}px`;
     item.element.style.height = `${size}px`;
     item.element.style.top = `${top}px`;
-    item.element.style.left = "auto";
+    item.element.style.left = `${columnX[safeCol]}px`;
     item.element.style.right = "auto";
-    item.element.style[isLeftSide ? "left" : "right"] = `${horizontalOffset}px`;
-    item.element.style.transform = `translateY(-50%) rotate(${rotation}deg)`;
+    item.element.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
     item.element.style.transformOrigin = "50% 50%";
     item.element.style.zIndex = String(10 + index);
   });

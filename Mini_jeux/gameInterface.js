@@ -1,3 +1,4 @@
+import { gameManager } from "./gameCleanup.js";
 export function createGameTitle(text) {
     const title = document.createElement("h2");
     title.textContent = text;
@@ -222,7 +223,7 @@ export function createMemoryGame(container, onFinish, pairs, pairsToNotDuplicate
     card.appendChild(cardInner);
 
     const clickHandler = () => {
-      if (!GameCleanup.gameRunning) return;
+      if (!gameManager.isRunning) return;
       if (cardData.flipped || cardData.matched || secondCard) return;
 
       cardData.flipped = true;
@@ -258,7 +259,7 @@ export function createMemoryGame(container, onFinish, pairs, pairsToNotDuplicate
           secondCard = null;
 
           if (matchedPairs === totalPairsToMatch) {
-            GameCleanup.cleanup();
+            gameManager.cleanup();
             setTimeout(() => {
               alert("Bravo, vous avez gagné !");
               onFinish();
@@ -267,7 +268,7 @@ export function createMemoryGame(container, onFinish, pairs, pairsToNotDuplicate
 
         } else {
           const timeout = setTimeout(() => {
-            if (GameCleanup.gameRunning) {
+            if (gameManager.isRunning) {
               firstCard.cardData.flipped = false;
               secondCard.cardData.flipped = false;
 
@@ -278,12 +279,12 @@ export function createMemoryGame(container, onFinish, pairs, pairsToNotDuplicate
               secondCard = null;
             }
           }, 700);
-          GameCleanup.addTimeout(timeout);
+          gameManager.addTimeout(timeout);
         }
       }
     };
 
-    GameCleanup.addEventListener(card, "click", clickHandler);
+    gameManager.addEventListener(card, "click", clickHandler);
 
     return card;
   }

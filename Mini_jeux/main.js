@@ -19,7 +19,6 @@ const DECORATIVE_IMAGE_LAYOUT = [
   { selector: ".side-pizza", side: "right", row: 1, scale: 0.95, rotate: -16 },
   { selector: ".side-manette2", side: "left", row: 2, scale: 0.84, rotate: -10 },
   { selector: ".side-bloc", side: "right", row: 2, scale: 0.92, rotate: -8 },
-  { selector: ".side-bloc2", side: "left", row: 2, scale: 0.92, rotate: -8 },
   { selector: ".side-manette", side: "right", row: 3, scale: 0.92, rotate: 10 },
   { selector: ".side-martien", side: "right", row: 3, scale: 0.9, rotate: 8 },
   { selector: ".side-pacman-echo", side: "left", row: 4, scale: 0.72, rotate: -14 },
@@ -47,16 +46,18 @@ function applyDecorativeImageLayout() {
   const sideInset = Math.max(18, Math.round(viewportWidth * 0.022));
 
   items.forEach((item, index) => {
-    const isLeftSide = index % 2 === 0;
+    const isLeftSide = item.side === "left";
     const top = marginY + gap * (index + 1);
     const size = Math.round(baseSize * sizeVariants[index % sizeVariants.length]);
     const rotation = rotationVariants[index % rotationVariants.length];
-    const horizontalOffset = sideInset + Math.round(size * 0.12);
+    const horizontalOffset = sideInset;
 
     item.element.style.width = `${size}px`;
     item.element.style.height = `${size}px`;
     item.element.style.top = `${top}px`;
-    item.element.style[isLeftSide ? "left" : "right"] = `-${horizontalOffset}px`;
+    item.element.style.left = "auto";
+    item.element.style.right = "auto";
+    item.element.style[isLeftSide ? "left" : "right"] = `${horizontalOffset}px`;
     item.element.style.transform = `translateY(-50%) rotate(${rotation}deg)`;
     item.element.style.transformOrigin = "50% 50%";
     item.element.style.zIndex = String(10 + index);

@@ -1,3 +1,5 @@
+import { gameManager } from "../gameCleanup.js"; 
+
 let game100 = {};
 
 export function startGame100(container, onFinish) {
@@ -35,7 +37,7 @@ export function startGame100(container, onFinish) {
 /* ---------- INIT ---------- */
 
 function initCube() {
-    const colors = ["#f055f0", "#62dff6", "#fff755", "#7e7eff"];
+    const colors = ["#e74c3c", "#3498db", "#f1c40f", "#2ecc71"];
 
     for (let row = 0; row < 4; row++) {
         for (let col = 0; col < 4; col++) {
@@ -47,6 +49,7 @@ function initCube() {
 /* ---------- MIX ---------- */
 
 function mixCube() {
+    // Mélange réel : lignes + colonnes
     for (let i = 0; i < 20; i++) {
         if (Math.random() < 0.5) {
             const row = Math.floor(Math.random() * 4);
@@ -86,10 +89,13 @@ function endDrag(e) {
     const row = game100.dragStart.y;
     const col = game100.dragStart.x;
 
+    // Horizontal → ligne
     if (Math.abs(dx) > Math.abs(dy)) {
         if (dx > 20) slideRow(row, 1, true);
         else if (dx < -20) slideRow(row, -1, true);
-    } else {
+    }
+    // Vertical → colonne
+    else {
         if (dy > 20) slideCol(col, 1, true);
         else if (dy < -20) slideCol(col, -1, true);
     }
@@ -135,47 +141,20 @@ function slideCol(col, dir, countMove) {
     renderCube();
 }
 
-/* ---------- CHECK WIN (nouvelle version) ---------- */
+/* ---------- CHECK WIN ---------- */
 
 function checkCubeWin() {
-    const size = 4;
-
-    /* ----- Vérifier si toutes les lignes sont monochromes ----- */
-    let allRowsMono = true;
-
-    for (let row = 0; row < size; row++) {
-        const start = row * size;
+    for (let row = 0; row < 4; row++) {
+        const start = row * 4;
         const color = game100.grid[start];
 
-        for (let col = 0; col < size; col++) {
-            if (game100.grid[start + col] !== color) {
-                allRowsMono = false;
-                break;
-            }
+        for (let i = 0; i < 4; i++) {
+            if (game100.grid[start + i] !== color) return;
         }
     }
 
-    /* ----- Vérifier si toutes les colonnes sont monochromes ----- */
-    let allColsMono = true;
-
-    for (let col = 0; col < size; col++) {
-        const color = game100.grid[col];
-
-        for (let row = 0; row < size; row++) {
-            if (game100.grid[row * size + col] !== color) {
-                allColsMono = false;
-                break;
-            }
-        }
-    }
-
-    /* ----- Condition de victoire ----- */
-    if (allRowsMono || allColsMono) {
-        document.getElementById("msg17").textContent =
-            "🎉 Bravo ! Toutes les lignes OU toutes les colonnes sont monochromes !";
-
-        setTimeout(game100.onFinish, 1500);
-    }
+    document.getElementById("msg17").textContent = "🎉 Bravo ! Toutes les lignes sont monochromes !";
+    setTimeout(game100.onFinish, 1500);
 }
 
 /* ---------- RENDER ---------- */

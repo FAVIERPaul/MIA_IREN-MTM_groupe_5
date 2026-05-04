@@ -1,4 +1,5 @@
 import { createGameTitle, createRebusDisplay, createInputField, createValidationButton, createFeedbackDiv, setFeedback, errorMessages } from "../gameInterface.js";
+import { gameManager } from "../gameCleanup.js";
 
 export function startGame4(container, onFinish) {
     container.innerHTML = "";

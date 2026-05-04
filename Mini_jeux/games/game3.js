@@ -1,3 +1,5 @@
+import { gameManager } from "../gameCleanup.js";
+
 export function startGame3(container, onFinish) {
   container.innerHTML = "";
   

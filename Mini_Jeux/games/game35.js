@@ -1,4 +1,5 @@
 import { createGameTitle } from "../gameInterface.js";
+import { gameManager } from "../gameCleanup.js";
 
 export function startGame35(container, onFinish) {
   if (!container) return;

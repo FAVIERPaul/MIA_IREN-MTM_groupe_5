@@ -1,4 +1,5 @@
-import { createGameTitle, createFeedbackDiv, setFeedback, errorMessages } from "../gameInterface.js";
+import { createGameTitle, createFeedbackDiv, setFeedback } from "../gameInterface.js";
+import { gameManager } from "../gameCleanup.js";
 
 export function startGame2(container, onFinish) {
   container.innerHTML = "";

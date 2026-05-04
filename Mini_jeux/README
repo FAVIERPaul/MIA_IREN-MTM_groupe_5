@@ -45,9 +45,9 @@ MIA_IREN-MTM_groupe_5
     │
     ├── style.css         → design et mise en forme
     │
-    ├── gameInterface.js  → composants UI réutilisables
+    ├── gameInterface.js  → composants UI réutilisables 
     │
-    ├── firebase.js       → connexion à Firebase 
+    ├── firebase.js       → connexion à Firebase ( )
     ├── score.js          → gestion des scores et classement
     │
     ├── games/            → ensemble des mini-jeux

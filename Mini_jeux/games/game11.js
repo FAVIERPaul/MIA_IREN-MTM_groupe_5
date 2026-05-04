@@ -1,5 +1,6 @@
 import { createGameTitle, setFeedback } from "../gameInterface.js";
 import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
+import { gameManager } from "../gameCleanup.js";
 
 export function startGame11(container, onFinish) {
   container.innerHTML = "";

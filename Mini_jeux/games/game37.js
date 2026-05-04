@@ -1,4 +1,5 @@
 import { createInputField, createValidationButton, createFeedbackDiv, setFeedback } from "../gameInterface.js";
+import { gameManager } from "../gameCleanup.js";
 
 export function startGame37(container, onFinish) {
   const levels = [

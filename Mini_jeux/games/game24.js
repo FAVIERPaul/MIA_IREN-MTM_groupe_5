@@ -1,3 +1,5 @@
+import { gameManager } from "../gameCleanup.js";
+
 let game22 = {};
 
 export function startGame24(container, onFinish) {

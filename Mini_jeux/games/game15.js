@@ -1,227 +1,212 @@
-import { gameManager } from "../gameCleanup.js";let gameState = {};
+import { gameManager } from "../gameCleanup.js";
 
-export function startGame15(container, onFinish) {
-    // 1. Agrandissement de la Grille (8x8) pour l'UX
+let game16 = {};
+
+export function startGame16(container, onFinish) {
     container.innerHTML = `
-        <div style="text-align:center; font-family: 'Segoe UI', sans-serif; color: white; background: #1a1a1a; padding: 20px; border-radius: 15px;">
-            <div style="font-size: 1.2em; margin-bottom: 10px;">📦 Mouvements : <span id="moves" style="color: #2ecc71;">0</span></div>
-            <canvas id="gameCanvas" width="480" height="480" style="border: 4px solid #34495e; border-radius: 8px; box-shadow: 0 0 20px rgba(0,0,0,0.5); cursor: grab;"></canvas>
-            <p id="gameMessage" style="margin-top: 15px; font-weight: bold; min-height: 24px;">Trouvez la sortie... 👀</p>
+        <div style="text-align:center; font-family: 'Segoe UI', sans-serif; color: white; background: #101018; padding: 20px; border-radius: 15px;">
+            
+            <div style="font-size: 1.1em; margin-bottom: 8px; font-family: 'VT323', monospace;">
+                🎨 Correspondance : 
+                <span style="color:#ff6b6b;">A = 1</span> • 
+                <span style="color:#feca57;">B = 2</span> • 
+                <span style="color:#1dd1a1;">C = 3</span> • 
+                <span style="color:#54a0ff;">D = 4</span>
+            </div>
+
+            <div style="font-size: 1.1em; margin-bottom: 10px; font-family: 'VT323', monospace;">
+                🎯 Somme cible par ligne : <span id="target16" style="color:#00e5ff;">10</span>
+            </div>
+
+            <canvas id="sumCanvas16" width="400" height="400"
+                style="border: 4px solid #00e5ff; border-radius: 8px; box-shadow: 0 0 20px #00e5ffaa; cursor: pointer;">
+            </canvas>
+
+            <p id="msg16" style="margin-top: 15px; font-weight: bold; min-height: 24px; font-family: 'VT323', monospace;">
+                Cliquez sur les cases pour ajuster les couleurs et atteindre la somme cible sur chaque ligne.
+            </p>
         </div>
     `;
 
-    const canvas = container.querySelector("#gameCanvas");
+    const canvas = container.querySelector("#sumCanvas16");
     const ctx = canvas.getContext("2d");
 
-    // Taille de grille 8x8 avec des cellules de 60px
-    gameState = {
-        ctx, canvas, cell: 60, vehicules: [],
-        selected: null, offset: { x: 0, y: 0 },
-        moves: 0, exitVisible: false, onFinish, status: "PLAYING"
+    game16 = {
+        ctx,
+        canvas,
+        size: 5,
+        cell: 80,
+        grid: [],
+        target: 10,
+        status: "PLAYING",
+        onFinish,
+
+        colors: {
+            A: "#ff6b6b", // rouge corail
+            B: "#feca57", // jaune chaud
+            C: "#1dd1a1", // vert menthe
+            D: "#54a0ff"  // bleu doux
+        },
+
+        values: {
+            A: 1,
+            B: 2,
+            C: 3,
+            D: 4
+        }
     };
 
-    creerVehicules();
-    canvas.addEventListener("mousedown", down);
-    window.addEventListener("mousemove", move);
-    window.addEventListener("mouseup", up);
+    initGame16();
+    canvas.addEventListener("click", onClick16);
 
     function loop() {
-        render();
-        if (gameState.status !== "WIN") requestAnimationFrame(loop);
+        render16();
+        if (game16.status !== "WIN") requestAnimationFrame(loop);
     }
     loop();
 }
 
-// ---------------- VÉHICULES ----------------
+/* ------------------ INIT ------------------ */
 
-function creerVehicules() {
-    // 2. Repositionnement pour un Puzzle non-superposé mais tactique
-    gameState.vehicules = [
-        // Le joueur : La Benne (Largeur 2, Hauteur 1)
-        { id: "player", x: 1, y: 3, w: 2, h: 1, dir: "h", color: "#27ae60", type: "garbage" },
-
-        // Autres voitures et camions (Positions ajustées pour la grille 8x8)
-        // BLOCAGE DIRECT
-        { x: 3, y: 3, w: 1, h: 2, dir: "v", color: "#e74c3c", type: "truck" }, // Bloque la voie directe
-        { x: 3, y: 2, w: 1, h: 1, dir: "v", color: "#3498db", type: "car" },   // Bloque le camion rouge
-
-        // OBSTACLES PERIPHERIQUES (Complexité)
-        { x: 0, y: 0, w: 3, h: 1, dir: "h", color: "#f1c40f", type: "truck" }, // Camion jaune
-        { x: 0, y: 2, w: 1, h: 2, dir: "v", color: "#9b59b6", type: "car" }, // Voiture violette
-        { x: 1, y: 1, w: 2, h: 1, dir: "h", color: "#d35400", type: "car" },   // Voiture orange
-        { x: 4, y: 1, w: 1, h: 3, dir: "v", color: "#e67e22", type: "truck" }, // Camion marron
-        { x: 5, y: 2, w: 2, h: 1, dir: "h", color: "#1abc9c", type: "car" },   // Voiture turquoise
-        { x: 2, y: 5, w: 1, h: 2, dir: "v", color: "#95a5a6", type: "car" },   // Voiture grise
-        { x: 4, y: 5, w: 2, h: 2, dir: "v", color: "#c0392b", type: "truck" }, // Gros camion rouge
-        { x: 0, y: 6, w: 2, h: 1, dir: "h", color: "#1abc9c", type: "car" }    // Voiture turquoise
-    ];
+function initGame16() {
+    const letters = ["A", "B", "C", "D"];
+    for (let i = 0; i < game16.size * game16.size; i++) {
+        const letter = letters[Math.floor(Math.random() * letters.length)];
+        game16.grid[i] = letter;
+    }
 }
 
-// ---------------- INPUT (Contrôles) ----------------
+/* ------------------ CLICK ------------------ */
 
-function down(e) {
-    if (gameState.status !== "PLAYING") return;
-    const rect = gameState.canvas.getBoundingClientRect();
+function onClick16(e) {
+    if (game16.status !== "PLAYING") return;
+
+    const rect = game16.canvas.getBoundingClientRect();
     const mx = e.clientX - rect.left;
     const my = e.clientY - rect.top;
 
-    gameState.vehicules.forEach(v => {
-        if (mx >= v.x * 60 && mx <= (v.x + v.w) * 60 && my >= v.y * 60 && my <= (v.y + v.h) * 60) {
-            gameState.selected = v;
-            gameState.offset.x = mx - v.x * 60;
-            gameState.offset.y = my - v.y * 60;
+    const x = Math.floor(mx / game16.cell);
+    const y = Math.floor(my / game16.cell);
+
+    if (x < 0 || y < 0 || x >= game16.size || y >= game16.size) return;
+
+    const idx = y * game16.size + x;
+    game16.grid[idx] = cycleLetter16(game16.grid[idx]);
+
+    checkWin16();
+}
+
+/* ------------------ LOGIQUE ------------------ */
+
+function cycleLetter16(letter) {
+    if (letter === "A") return "B";
+    if (letter === "B") return "C";
+    if (letter === "C") return "D";
+    return "A";
+}
+
+function checkWin16() {
+    for (let y = 0; y < game16.size; y++) {
+        let sum = 0;
+        for (let x = 0; x < game16.size; x++) {
+            const idx = y * game16.size + x;
+            const letter = game16.grid[idx];
+            sum += game16.values[letter];
         }
-    });
-}
-
-function move(e) {
-    const v = gameState.selected;
-    if (!v) return;
-    const rect = gameState.canvas.getBoundingClientRect();
-    const mx = e.clientX - rect.left;
-    const my = e.clientY - rect.top;
-
-    let nx = v.x, ny = v.y;
-    if (v.dir === "h") nx = Math.round((mx - gameState.offset.x) / 60);
-    else ny = Math.round((my - gameState.offset.y) / 60);
-
-    if (isValid(v, nx, ny)) {
-        if (nx !== v.x || ny !== v.y) {
-            v.x = nx; v.y = ny;
-            gameState.moves++;
-            document.getElementById("moves").textContent = gameState.moves;
-           // La sortie apparaît uniquement si on déplace la voiture violette (A2–A3)
-if (v.color === "#9b59b6") {
-    gameState.exitVisible = true;
-}
-
-            checkWin();
+        if (sum !== game16.target) {
+            document.getElementById("msg16").textContent =
+                "Toutes les lignes doivent atteindre la somme " + game16.target + " (actuellement, la ligne " + (y + 1) + " vaut " + sum + ").";
+            return;
         }
     }
+
+    game16.status = "WIN";
+    document.getElementById("msg16").textContent = "🎉 Sommes parfaites sur toutes les lignes !";
+    setTimeout(game16.onFinish, 1500);
 }
 
-function up() { gameState.selected = null; }
+/* ------------------ RENDER ------------------ */
 
-// ---------------- LOGIQUE (Mouvements / Victoire) ----------------
+function render16() {
+    const ctx = game16.ctx;
+    ctx.fillStyle = "#05060a";
+    ctx.fillRect(0, 0, game16.canvas.width, game16.canvas.height);
 
-function isValid(v, nx, ny) {
-    // Limites de la grille 8x8
-    if (nx < 0 || ny < 0 || nx + v.w > 8 || ny + v.h > 8) return false;
-    return !gameState.vehicules.some(o => {
-        if (o === v) return false;
-        return nx < o.x + o.w && nx + v.w > o.x && ny < o.y + o.h && ny + v.h > o.y;
-    });
-}
+    for (let i = 0; i < game16.size * game16.size; i++) {
+        const letter = game16.grid[i];
+        const color = game16.colors[letter];
 
-function checkWin() {
-    const p = gameState.vehicules[0];
-    
-    // 3. Piège (Positionné stratégiquement sur 8x8)
-    if (p.x >= 6 && p.y === 3) {
-        document.getElementById("gameMessage").textContent = "💀 Piège ! Le trou était profond...";
-        gameState.status = "TRAP";
-        setTimeout(() => { p.x = 1; p.y = 3; gameState.status = "PLAYING"; document.getElementById("gameMessage").textContent = "Réessayez !"; }, 1000);
-    }
-    
-    // Vraie sortie (Cachée, mais à débloquer)
-    if (gameState.exitVisible && p.x <= 0 && p.y === 3) {
-        gameState.status = "WIN";
-        document.getElementById("gameMessage").textContent = "🎉 La benne est à l'abri !";
-        setTimeout(gameState.onFinish, 1500);
-    }
-}
+        const x = (i % game16.size) * game16.cell;
+        const y = Math.floor(i / game16.size) * game16.cell;
 
-// ---------------- RENDER (Graphismes) ----------------
+        // Fond de la case
+        const grad = ctx.createLinearGradient(x, y, x + game16.cell, y + game16.cell);
+        grad.addColorStop(0, lighten16(color, 0.2));
+        grad.addColorStop(1, color);
 
-function drawVehicle(v) {
-    const ctx = gameState.ctx;
-    const x = v.x * 60 + 4;
-    const y = v.y * 60 + 4;
-    const w = v.w * 60 - 8;
-    const h = v.h * 60 - 8;
-    const radius = 10;
+        ctx.fillStyle = grad;
+        drawRoundedRect16(ctx, x + 6, y + 6, game16.cell - 12, game16.cell - 12, 12);
+        ctx.fill();
 
-    ctx.save();
-    ctx.shadowColor = "rgba(0,0,0,0.4)";
-    ctx.shadowBlur = 8;
-    ctx.shadowOffsetY = 4;
-
-    ctx.fillStyle = v.color;
-    ctx.beginPath();
-    ctx.roundRect(x, y, w, h, radius);
-    ctx.fill();
-    ctx.shadowBlur = 0;
-
-    // --- Détails selon le type (Look Arcade) ---
-    ctx.fillStyle = "rgba(255,255,255,0.2)"; // Reflet carrosserie
-    ctx.fillRect(x + 5, y + 5, w - 10, h / 4);
-
-    if (v.type === "garbage") {
-        // Look Benne à ordures
-        ctx.fillStyle = "#1e8449";
-        ctx.fillRect(x + w * 0.1, y + h * 0.1, w * 0.6, h * 0.8); // Zone de chargement
-        ctx.strokeStyle = "white";
+        // Bord
+        ctx.strokeStyle = "#ffffff22";
         ctx.lineWidth = 2;
-        ctx.strokeRect(x + w * 0.1, y + h * 0.1, w * 0.6, h * 0.8);
-        ctx.fillStyle = "#2ecc71";
-        ctx.fillRect(x + w * 0.75, y + h * 0.15, w * 0.2, h * 0.7); // Cabine
-        ctx.fillStyle = "orange"; // Gyrophare
-        ctx.beginPath(); ctx.arc(x + w * 0.7, y + h * 0.2, 4, 0, Math.PI * 2); ctx.fill();
-    } else {
-        // Look Voiture / Camion classique
-        const isVert = v.dir === "v";
-        ctx.fillStyle = "#34495e"; // Pare-brise
-        if (isVert) {
-            ctx.fillRect(x + w * 0.1, y + h * 0.2, w * 0.8, h * 0.15); // Avant
-            ctx.fillRect(x + w * 0.1, y + h * 0.7, w * 0.8, h * 0.05); // Arrière
-        } else {
-            ctx.fillRect(x + w * 0.7, y + h * 0.1, w * 0.15, h * 0.8); // Avant
-            ctx.fillRect(x + w * 0.1, y + h * 0.1, w * 0.05, h * 0.8); // Arrière
+        ctx.stroke();
+
+        // Lettre + valeur
+        ctx.fillStyle = "#000000bb";
+        ctx.font = "bold 26px VT323";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(letter, x + game16.cell / 2, y + game16.cell / 2 - 8);
+
+        ctx.fillStyle = "#ffffffdd";
+        ctx.font = "18px VT323";
+        ctx.fillText(game16.values[letter], x + game16.cell / 2, y + game16.cell / 2 + 16);
+    }
+
+    // Affichage des sommes actuelles à droite de chaque ligne
+    ctx.font = "18px VT323";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "middle";
+    for (let y = 0; y < game16.size; y++) {
+        let sum = 0;
+        for (let x = 0; x < game16.size; x++) {
+            const idx = y * game16.size + x;
+            sum += game16.values[game16.grid[idx]];
         }
+        ctx.fillStyle = sum === game16.target ? "#1dd1a1" : "#ff6b6b";
+        ctx.fillText("= " + sum, game16.canvas.width - 60, y * game16.cell + game16.cell / 2);
     }
-
-    // Phares (Lumière)
-    ctx.fillStyle = "#f1c40f";
-    if (v.dir === "h") {
-        ctx.fillRect(x + w - 5, y + 5, 5, 10);
-        ctx.fillRect(x + w - 5, y + h - 15, 5, 10);
-    } else {
-        ctx.fillRect(x + 5, y - 2, 10, 5);
-        ctx.fillRect(x + w - 15, y - 2, 10, 5);
-    }
-
-    ctx.restore();
 }
 
-function render() {
-    const ctx = gameState.ctx;
-    // Fond bitume (Ajusté pour 8x8)
-    ctx.fillStyle = "#34495e";
-    ctx.fillRect(0, 0, 480, 480);
+/* ------------------ UTIL: RECTANGLE ARRONDI ------------------ */
 
-    // Lignes de route
-    ctx.strokeStyle = "rgba(255,255,255,0.1)";
-    ctx.lineWidth = 2;
-    for (let i = 1; i < 8; i++) {
-        ctx.beginPath(); ctx.moveTo(i * 60, 0); ctx.lineTo(i * 60, 480); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(0, i * 60); ctx.lineTo(480, i * 60); ctx.stroke();
-    }
+function drawRoundedRect16(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+}
 
-    // Piège (Bouche d'égout ouverte, Positionné sur la grille 8x8)
-    ctx.fillStyle = "#111";
-    ctx.beginPath(); ctx.arc(480, 210, 30, 0, Math.PI * 2); ctx.fill();
-    ctx.strokeStyle = "red";
-    ctx.lineWidth = 3;
-    ctx.stroke();
+/* ------------------ UTIL: LIGHTEN ------------------ */
 
-    // Vraie sortie (Cachée, mais à débloquer tactiquement)
-    if (gameState.exitVisible) {
-        ctx.fillStyle = "#2ecc71";
-        ctx.fillRect(0, 180, 15, 60);
-        ctx.fillStyle = "white";
-        ctx.font = "bold 12px Arial";
-        ctx.fillText("EXIT", 18, 215);
-    }
+function lighten16(hex, amount) {
+    const num = parseInt(hex.slice(1), 16);
+    let r = (num >> 16) + Math.floor(255 * amount);
+    let g = ((num >> 8) & 0xff) + Math.floor(255 * amount);
+    let b = (num & 0xff) + Math.floor(255 * amount);
 
-    gameState.vehicules.forEach(drawVehicle);
+    r = Math.min(255, r);
+    g = Math.min(255, g);
+    b = Math.min(255, b);
+
+    return `rgb(${r},${g},${b})`;
 }

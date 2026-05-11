@@ -4,7 +4,7 @@ import { gameManager } from "../gameCleanup.js";
 export function startGame1(container, onFinish) {
   container.innerHTML = "";
 
-  const title = createGameTitle("Labyrinthe");
+  const title = createGameTitle("Pizza Cut");
   const feedbackDiv = createFeedbackDiv();
   container.appendChild(title);
   container.appendChild(feedbackDiv);
@@ -13,109 +13,133 @@ export function startGame1(container, onFinish) {
   container.appendChild(canvas);
 
   const ctx = canvas.getContext("2d");
-
   canvas.width = 600;
   canvas.height = 600;
 
-  const tileSize = 60;
+  const center = { x: 300, y: 300 };
+  const radius = 250;
 
-  const level = {
-    map: [
-      [1,1,1,1,1,1,1,1,1,1],
-      [1,0,0,0,1,0,0,0,0,1],
-      [1,0,1,0,1,0,1,1,0,1],
-      [1,0,1,0,0,0,0,1,0,1],
-      [1,0,1,1,1,1,0,1,0,1],
-      [1,0,0,0,0,1,0,0,0,1],
-      [1,1,1,1,0,1,1,1,0,1],
-      [1,0,0,1,0,0,0,1,0,1],
-      [1,0,0,0,0,1,0,0,2,1],
-      [1,1,1,1,1,1,1,1,1,1]
-    ],
-    playerStart: { x: 1, y: 1 },
-    controls: { up: "s", down: "z", left: "e", right: "a" }
-  };
+  // --- IMAGES ---
+  const pizzaImg = new Image();
+  pizzaImg.src = "assets/pizza.png"; // ta pizza réaliste (celle que tu as envoyée)
 
-  let player = { ...level.playerStart };
-  let keys = {};
+  const knifeImg = new Image();
+  knifeImg.src = "assets/knife.png"; // couteau vu du dessus, fond transparent
 
-  function handleKeyDown(e) {
-    keys[e.key.toLowerCase()] = true;
+  let cuts = [];
+  let mouse = { x: 0, y: 0, isDown: false };
+
+  function onMouseMove(e) {
+    const rect = canvas.getBoundingClientRect();
+    mouse.x = e.clientX - rect.left;
+    mouse.y = e.clientY - rect.top;
   }
 
-  function handleKeyUp(e) {
-    keys[e.key.toLowerCase()] = false;
+  function onMouseDown() {
+    mouse.isDown = true;
   }
 
-  gameManager.addEventListener(document, "keydown", handleKeyDown);
-  gameManager.addEventListener(document, "keyup", handleKeyUp);
+  function onMouseUp() {
+    if (!mouse.isDown) return;
+    mouse.isDown = false;
 
-  function move(dx, dy) {
-    
-    
-    let newX = player.x + dx;
-    let newY = player.y + dy;
+    const angle = Math.atan2(mouse.y - center.y, mouse.x - center.x);
 
-    if (level.map[newY][newX] !== 1) {
-      player.x = newX;
-      player.y = newY;
+    cuts.push({
+      angle,
+      x1: center.x,
+      y1: center.y,
+      x2: center.x + Math.cos(angle) * radius,
+      y2: center.y + Math.sin(angle) * radius
+    });
 
-      if (level.map[newY][newX] === 2) {
-        onWin();
-      }
-    }
+    checkWin();
   }
 
-  function update() {
-    
-    
-    const c = level.controls;
+  gameManager.addEventListener(canvas, "mousemove", onMouseMove);
+  gameManager.addEventListener(canvas, "mousedown", onMouseDown);
+  gameManager.addEventListener(canvas, "mouseup", onMouseUp);
 
-    if (keys[c.up]) move(0, -1);
-    if (keys[c.down]) move(0, 1);
-    if (keys[c.left]) move(-1, 0);
-    if (keys[c.right]) move(1, 0);
+  // --- PIZZA STATIQUE ---
+  function drawPizza() {
+    ctx.drawImage(pizzaImg, center.x - radius, center.y - radius, radius * 2, radius * 2);
   }
 
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  // --- TRAITS BLANCS DE COUPE ---
+  function drawCuts() {
+    cuts.forEach(c => {
+      ctx.save();
+      ctx.strokeStyle = "white"; // couleur du fond, comme sur ton image
+      ctx.lineWidth = 6;
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(c.x1, c.y1);
+      ctx.lineTo(c.x2, c.y2);
+      ctx.stroke();
+      ctx.restore();
+    });
+  }
 
-    for (let y = 0; y < level.map.length; y++) {
-      for (let x = 0; x < level.map[y].length; x++) {
-        let tile = level.map[y][x];
+  // --- COUTEAU PNG ---
+  function drawKnife() {
+    ctx.save();
+    const angle = Math.atan2(mouse.y - center.y, mouse.x - center.x);
+    ctx.translate(mouse.x, mouse.y);
+    ctx.rotate(angle);
 
-        ctx.fillStyle = tile === 1 ? "white" : tile === 2 ? "green" : "black";
-        ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
-      }
-    }
-
-    ctx.fillStyle = "red";
-    ctx.fillRect(
-      player.x * tileSize + 10,
-      player.y * tileSize + 10,
-      tileSize - 20,
-      tileSize - 20
+    const scale = 0.4;
+    ctx.drawImage(
+      knifeImg,
+      -knifeImg.width * scale / 2,
+      -knifeImg.height * scale / 2,
+      knifeImg.width * scale,
+      knifeImg.height * scale
     );
+
+    ctx.restore();
   }
 
-  function showFeedback(isSuccess, message) {
-    setFeedback(feedbackDiv, isSuccess, message);
+  // --- CHECK WIN ---
+  function checkWin() {
+    if (cuts.length < 4) return;
+
+    const angles = cuts.map(c => c.angle).sort((a, b) => a - b);
+
+    let parts = [];
+    for (let i = 0; i < angles.length; i++) {
+      const a1 = angles[i];
+      const a2 = angles[(i + 1) % angles.length];
+      let diff = a2 - a1;
+      if (diff < 0) diff += Math.PI * 2;
+      parts.push(diff);
+    }
+
+    const min = Math.min(...parts);
+    const max = Math.max(...parts);
+
+    if (min / max < 0.8) {
+      cuts = [];
+      setFeedback(feedbackDiv, false, "✗ Les parts sont trop similaires !");
+      return;
+    }
+
+    onWin();
   }
 
   function onWin() {
     gameManager.cleanup();
-    showFeedback(true, "✓ Bien joué !");
-    const timeout = gameManager.addTimeout(setTimeout(onFinish, 500));
+    setFeedback(feedbackDiv, true, "✓ Bien joué !");
+    gameManager.addTimeout(setTimeout(onFinish, 500));
   }
 
-  let frameId = null;
-  function loop() {
-    
-    update();
-    draw();
-    frameId = requestAnimationFrame(loop);
-    gameManager.addAnimationFrame(frameId);
+  // --- LOOP ---
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawPizza();
+    drawCuts();
+    drawKnife();
+    requestAnimationFrame(draw);
   }
 
-  loop();
+  draw();
 }
